@@ -1,1 +1,4 @@
-export const manualToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2N2Y1NDQxOWIxYTViZTIyNzc2ODQxOSIsImlhdCI6MTcxOTc4MTU0OCwiZXhwIjoxNzE5ODY3OTQ4fQ.AHfJoQW_qKo7v1FXhk_tzHrfiHp1Ym6J3wdYUhZRSbI'
+export const manualToken =
+    
+    
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2N2Y1NDQxOWIxYTViZTIyNzc2ODQxOSIsImlhdCI6MTcxOTg3MjEyMywiZXhwIjoxNzE5OTU4NTIzfQ.CPG_10U2zD2ddkuPNL5gSgJhpkuygQWkxJCiq6ryGH8'
