@@ -39,9 +39,6 @@ export default function GetAllTransactions() {
   }
 
   async function handleDelete(id: string) {
-    const token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2N2Y1NDQxOWIxYTViZTIyNzc2ODQxOSIsImlhdCI6MTcxOTc4MTU0OCwiZXhwIjoxNzE5ODY3OTQ4fQ.AHfJoQW_qKo7v1FXhk_tzHrfiHp1Ym6J3wdYUhZRSbI";
-
     //Request user confirmation for delete transaction:
     const isConfirmed = window.confirm(
       ` Você realmente quer apagar esta transação? Não será mais possível recuperá-la!`
@@ -53,7 +50,7 @@ export default function GetAllTransactions() {
       //await api.delete(`/transaction/${id}`, {
       await api.delete("transaction", {
         params: { id: id },
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${manualToken}` },
       });
 
       //Atualize o estado local removendo a transação deletada

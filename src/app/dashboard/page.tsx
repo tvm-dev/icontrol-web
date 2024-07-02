@@ -106,43 +106,47 @@ export default function Dashboad() {
         </div>
 
         {/* Balance */}
+        <p className="font-semibold">Saldos</p>
         {fiSum !== null && viSum !== null && (
           <div className="grid grid-cols-2 drop-shadow-2xl text-white text-center p-6 rounded bg-blue-400">
             <div className="border-r-2">
-              <h1 className="font-bold">R$ ?</h1>
-              <p className="text-sm">Saldo Geral</p>
+              <h1 className="font-bold"> R$ {fiSum + viSum} </h1>
+              <p className="text-sm">Atual</p>
             </div>
             <div>
               <div>
                 <h1 className="font-bold">R$ ?</h1>
-                <p className="text-sm">Saldo Previsto</p>
+                <p className="text-sm">Previsto</p>
               </div>
             </div>
           </div>
         )}
 
         {/* Revenues ============================== */}
+        <p className="font-semibold">Receitas</p>
         {fiSum !== null && viSum !== null && (
           <Link href={"/revenues"}>
             <div
-              className="grid grid-cols-2 drop-shadow-2xl mt-5 text-white  text-center p-2 rounded bg-green-400         
+              className="grid grid-cols-2 drop-shadow-2xl text-black  text-center p-2 rounded bg-green-400         
           hover:bg-green-500 transition duration-500"
             >
               <div className="border-r-2">
-                <h1 className="font-bold text-3xl mt-5">
+                <h1 className="font-bold text-3xl">
                   <span className="font-thin text-sm">R$</span> {fiSum + viSum}
                 </h1>
-                <p className="text-sm">Receita total deste mês</p>
+                <p className="text-sm">Atual</p>
+                <p>R$ 20.000,22</p>
+                <p>Prevista</p>
               </div>
               <div>
                 <div>
                   <h1 className="font-bold">R$ {fiSum}</h1>
-                  <p className="">Receitas Fixas</p>
+                  <p className="">Fixas</p>
                 </div>
 
                 <div>
                   <h1 className="font-bold">R$ {viSum} </h1>
-                  <p className="">Receitas Variáveis</p>
+                  <p className="">Variáveis</p>
                 </div>
               </div>
             </div>
@@ -150,17 +154,20 @@ export default function Dashboad() {
         )}
 
         {/* Expenses ============================== */}
+        <p className="font-semibold">Despesas</p>
         {feSum !== null && veSum !== null && (
           <Link href={"/expenses"}>
             <div
-              className="grid grid-cols-2 drop-shadow-2xl text-white mt-5  text-center p-2 rounded bg-red-400         
+              className="grid grid-cols-2 drop-shadow-2xl text-white text-center p-2 rounded bg-red-400         
           hover:bg-red-500 transition duration-500"
             >
               <div className="border-r-2">
                 <h1 className="font-bold text-3xl mt-5">
                   <span className="font-thin text-sm">R$</span> {feSum + veSum}
                 </h1>
-                <p className="text-sm">Receita total deste mês</p>
+                <p className="text-sm">Atual</p>
+                <p>R$ 20.000,22</p>
+                <p>Prevista</p>
               </div>
               <div>
                 <div>
@@ -178,19 +185,20 @@ export default function Dashboad() {
         )}
 
         {/* Investiments ==============================*/}
+        <p className="font-semibold">Investimentos</p>
         {inSum !== null && (
           <Link href={"/investments"}>
-            <div className="grid grid-cols-2 drop-shadow-2xl text-white mt-5  text-center p-2 rounded bg-yellow-400 hover:bg-yellow-500 transition duration-500">
+            <div className="grid grid-cols-2 drop-shadow-2xl text-white text-center p-2 rounded bg-sky-800 hover:bg-yellow-500 transition duration-500">
               <div className="border-r-2">
                 <h1 className="font-bold text-3xl">
                   <span className="font-thin text-sm">R$</span> {inSum}
                 </h1>
-                <p className="text-sm">Investimentos deste mês</p>
+                <p className="text-sm">Deste mês</p>
               </div>
               <div>
                 <div>
                   <h1 className="font-bold">R$ 100.000,21</h1>
-                  <p className="">Investimento Total</p>
+                  <p className="">Total</p>
                 </div>
               </div>
             </div>
@@ -198,48 +206,6 @@ export default function Dashboad() {
         )}
 
         {/* Graficos */}
-        {/* <h2 className="font-bold m-5 mt-5 ">Números em Gráficos</h2> */}
-        {/* Saldos */}
-        {/* <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-5 m-1 text-center">
-          <div className="bg-orange-400 h-32 rounded pt-2 font-semibold">
-            Saldos
-          </div>
-        </div> */}
-        {/* ---------- */}
-        {/* Despesas Variáveis */}
-        {/* <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-5 m-1 text-center">
-          <div className="bg-orange-400 h-32 rounded pt-2 font-semibold">
-            Despesas Variáveis
-          </div>
-        </div> */}
-        {/* ---------- */}
-        {/* Despesas Fixas */}
-        {/* <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-5 m-1 text-center">
-          <div className="bg-orange-400 h-32 rounded pt-2 font-semibold">
-            Despesas Fixas
-          </div>
-        </div> */}
-        {/* ---------- */}
-        {/* Receitas Variaveis */}
-        {/* <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-5 m-1 text-center">
-          <div className="bg-orange-400 h-32 rounded pt-2 font-semibold">
-            Receitas Variaveis
-          </div>
-        </div> */}
-        {/* ---------- */}
-        {/* Receitas Fixas */}
-        {/* <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-5 m-1 text-center">
-          <div className="bg-orange-400 h-32 rounded pt-2 font-semibold">
-            Receitas Fixas
-          </div>
-        </div> */}
-        {/* ---------- */}
-        {/* Investimentos */}
-        {/* <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-5 m-1 text-center">
-          <div className="bg-orange-400 h-32 rounded pt-2 font-semibold">
-            Investimentos
-          </div>
-        </div> */}
       </div>
     </>
   );

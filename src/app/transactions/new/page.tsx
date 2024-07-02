@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/app/services/api";
+import { manualToken } from "@/app/services/token";
 import axios from "axios";
 import { FormEvent, useRef, useEffect } from "react";
 
@@ -16,9 +17,6 @@ export default function NewTransaction() {
 
   async function handleRegisterTransaction(event: FormEvent) {
     event.preventDefault();
-
-    const token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2N2Y1NDQxOWIxYTViZTIyNzc2ODQxOSIsImlhdCI6MTcxOTc4MTU0OCwiZXhwIjoxNzE5ODY3OTQ4fQ.AHfJoQW_qKo7v1FXhk_tzHrfiHp1Ym6J3wdYUhZRSbI";
 
     const transactionData = {
       description: descriptionRef.current?.value || "",
@@ -36,7 +34,7 @@ export default function NewTransaction() {
     try {
       const response = await api.post("/transaction", transactionData, {
         params: { userID: "667f54419b1a5be227768419" },
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${manualToken}` },
       });
 
       if (response.status === 200) {

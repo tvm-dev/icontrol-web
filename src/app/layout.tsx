@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Ubuntu } from "next/font/google";
 import "./globals.css";
 
 import Header from "@/app/Shared/Header";
 import { title } from "process";
 
-const inter = Inter({ subsets: ["latin"] });
+//const mainFontFamily = Ubuntu({ subsets: ["latin"] });
+const mainFontFamily = Ubuntu({
+  weight: ["300", "400", "700"],
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "iControl: pq vc controla SUA GRANA!",
@@ -24,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="bg-blue-200">
+    <html lang="en" className={mainFontFamily.className}>
+      <body className="">
         <Header />
 
         {children}
