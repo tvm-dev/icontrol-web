@@ -78,12 +78,12 @@ export default function NewTransaction() {
 
   return (
     <>
-      <h1 className="text-center text-1xl p-3 bg-blue-400 rounded m-1">
+      <h1 className="text-center font-bold text-blue-600 mt-1">
         Nova Transação
       </h1>
-      <div className="m-1 p-1">
+      <div className="">
         <form
-          className="flex flex-col m-10"
+          className="flex flex-col mx-12 my-2"
           onSubmit={handleRegisterTransaction}
         >
           {/* Description */}
@@ -92,18 +92,19 @@ export default function NewTransaction() {
             ref={descriptionRef}
             type="text"
             required
-            className="border border-1 w-full mb-5 p-2 rounded"
+            className="border border-1 w-full mb-2 p-2 rounded"
           />
           {/* End */}
 
           {/* Amount */}
+
           <label className="font-medium">Valor:</label>
           <input
             ref={amountRef}
             defaultValue="55"
             type="number"
             required
-            className="border border-1 w-full mb-5 p-2 rounded"
+            className="border border-1 w-full mb-2 p-2 rounded"
           />
           {/* End */}
 
@@ -111,25 +112,17 @@ export default function NewTransaction() {
           <label className="font-medium">Data:</label>
           <input
             ref={dateRef}
+            required
             type="date"
-            className="border border-1 w-full mb-5 p-2 rounded"
+            className="border border-1 w-full mb-2 p-2 rounded"
           />
           {/* End */}
 
-          {/* Type ==================================================================== */}
-          {/* <label className="font-medium">Tipo:</label>
-          <input
-            defaultValue="2"
-            ref={typeRef}
-            type="number"
-            className="border border-1 w-full mb-5 p-2 rounded"
-          /> */}
-
-          {/* Type */}
+          {/* Type ====================================== */}
           <label className="font-medium">Tipo:</label>
           <select
             ref={typeRef}
-            className="border border-1 w-full mb-5 p-2 rounded"
+            className="border border-1 w-full mb-2 p-2 rounded"
           >
             <option value="1">Despesa Variável</option>
             <option value="2">Receita Variável</option>
@@ -139,13 +132,11 @@ export default function NewTransaction() {
           </select>
           {/* End */}
 
-          {/* End */}
-
           {/* Payment */}
           <label className="font-medium">Pago com:</label>
           <select
             ref={paymentRef}
-            className="border border-1 w-full mb-5 p-2 rounded"
+            className="border border-1 w-full mb-2 p-2 rounded"
           >
             <option value="1">Débito</option>
             <option value="2">Crédito</option>
@@ -159,7 +150,7 @@ export default function NewTransaction() {
           <label className="font-medium">Categoria:</label>
           <select
             ref={categoryRef}
-            className="border border-1 w-full mb-5 p-2 rounded"
+            className="border border-1 w-full mb-2 p-2 rounded"
           >
             <option value="1">Habitação</option>
             <option value="2">Transporte</option>
@@ -189,7 +180,7 @@ export default function NewTransaction() {
           <input
             ref={detailsRef}
             type="text"
-            className="border border-1 w-full mb-5 p-2 rounded"
+            className="border border-1 w-full mb-2 p-2 rounded"
           />
           {/* End */}
 
@@ -197,7 +188,7 @@ export default function NewTransaction() {
           <label className="font-medium">Status</label>
           <select
             ref={statusRef}
-            className="border border-1 w-full mb-5 p-2 rounded"
+            className="border border-1 w-full mb-2 p-2 rounded"
           >
             <option value="1">Pago</option>
             <option value="2">Pendente</option>

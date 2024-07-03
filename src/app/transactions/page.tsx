@@ -67,6 +67,27 @@ export default function GetAllTransactions() {
     <>
       <h1 className="my-5 text-center text-2xl font-bold ">Todas Transações</h1>
 
+      <div className="flex justify-center">
+        {/* Type ====================================== */}
+        <label className="p-1">Navegue por mês: </label>
+        <select className="">
+          <option value="0"></option>
+          <option value="1">Janeiro</option>
+          <option value="2">Fevereiro</option>
+          <option value="3">Março</option>
+          <option value="4">Abril</option>
+          <option value="5">Maio</option>
+          <option value="6">Junho</option>
+          <option value="7">Julho</option>
+          <option value="8">Agosto</option>
+          <option value="9">Setembro</option>
+          <option value="10">Outubro</option>
+          <option value="11">Novembro</option>
+          <option value="12">Dezembro</option>
+        </select>
+        {/* End */}
+      </div>
+
       <section className="flex flex-col mr-2 gap-5">
         {transactions.map((transaction, id) => (
           <div
