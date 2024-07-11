@@ -3,11 +3,16 @@ import { manualToken } from "../services/token";
 import { api } from "../services/api";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { formatCurrencyBRL } from "@/utils/formatCurrencies";
 
 //Interfaces:
 // interface investmentsProps {
 //   sum: number;
 // }
+
+interface CurrencyComponentProps {
+  amount: number;
+}
 
 export default function Dashboad() {
   //=======================Loading Balances:
@@ -93,14 +98,6 @@ export default function Dashboad() {
     }
   }
 
-  //Formatting currenc:
-  const formatCurrency = (value: number): string => {
-    return value.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
-  };
-
   return (
     <>
       <div className="m-5">
@@ -127,7 +124,7 @@ export default function Dashboad() {
         <div className="grid grid-cols-2 drop-shadow-2xl text-white text-center py-4 rounded bg-blue-400">
           <div className="border-r-2">
             <h1 className="font-bold text-2xl">
-              {formatCurrency((fiSum ?? 0) + (viSum ?? 0))}
+              {formatCurrencyBRL((fiSum ?? 0) + (viSum ?? 0))}
             </h1>
             <p className="text-sm">Atual</p>
           </div>
@@ -151,7 +148,7 @@ export default function Dashboad() {
           >
             <div className="border-r-2">
               <h1 className="font-bold text-3xl">
-                {formatCurrency((fiSum ?? 0) + (viSum ?? 0))}
+                {formatCurrencyBRL((fiSum ?? 0) + (viSum ?? 0))}
               </h1>
               <p className="text-sm">Atual</p>
 
@@ -162,12 +159,12 @@ export default function Dashboad() {
             </div>
             <div>
               <div>
-                <h1 className="font-bold"> {formatCurrency(fiSum ?? 0)} </h1>
+                <h1 className="font-bold"> {formatCurrencyBRL(fiSum ?? 0)} </h1>
                 <p className="">Fixas</p>
               </div>
 
               <div>
-                <h1 className="font-bold"> {formatCurrency(viSum ?? 0)} </h1>
+                <h1 className="font-bold"> {formatCurrencyBRL(viSum ?? 0)} </h1>
                 <p className="">Variáveis</p>
               </div>
             </div>
@@ -184,20 +181,26 @@ export default function Dashboad() {
           >
             <div className="border-r-2">
               <h1 className="font-bold text-3xl">
-                {formatCurrency((feSum ?? 0) + (veSum ?? 0))}
+                - {formatCurrencyBRL((feSum ?? 0) + (veSum ?? 0))}
               </h1>
               <p className="text-sm">Atual</p>
-              <p>R$ ?</p>
+              <p> - R$ ?</p>
               <p>Prevista</p>
             </div>
             <div>
               <div>
-                <h1 className="font-bold"> {formatCurrency(feSum ?? 0)}</h1>
+                <h1 className="font-bold">
+                  {" "}
+                  - {formatCurrencyBRL(feSum ?? 0)}
+                </h1>
                 <p className="">Fixas</p>
               </div>
               <span className="underline"> </span>
               <div>
-                <h1 className="font-bold">{formatCurrency(veSum ?? 0)} </h1>
+                <h1 className="font-bold">
+                  {" "}
+                  - {formatCurrencyBRL(veSum ?? 0)}{" "}
+                </h1>
                 <p className="">Variáveis</p>
               </div>
             </div>
@@ -211,8 +214,8 @@ export default function Dashboad() {
           <div className="grid grid-cols-2 drop-shadow-2xl text-white text-center py-5 rounded bg-sky-800 hover:bg-yellow-500 transition duration-500">
             <div className="border-r-2">
               <h1 className="font-bold text-2xl">
-                <span className="font-thin text-sm">R$</span>{" "}
-                {formatCurrency(inSum ?? 0)}
+                <span className="font-thin text-sm"> - </span>{" "}
+                {formatCurrencyBRL(inSum ?? 0)}
               </h1>
               <p className="text-sm">Este mês</p>
             </div>

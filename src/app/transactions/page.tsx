@@ -2,23 +2,33 @@
 
 import { useEffect, useState } from "react";
 import { manualToken } from "../services/token";
-import { api, token } from "@/app/services/api";
-import { FiTrash } from "react-icons/fi";
+import { api } from "@/app/services/api";
 
-interface TransactionsProps {
-  id: string;
-  description: string;
-  amount: number;
-  date: string;
-  payment: string;
-  category: string;
-  type: number;
-  details: string;
-  paid: boolean;
-}
+import {
+  getCurrentMonth,
+  Transactions,
+  filterTransactionsByMonth,
+} from "@/utils/boniak/dataFilter";
+import AreaMonth from "../components/transactionsPages";
+import AreaBalanceMonth from "../components/transactionsPages/areaMonths";
+import AreaFilter from "../components/transactionsPages/areaFilters";
+import AreaTransactions from "../components/transactionsPages/tableTransactions/page";
+import RowTransaction from "../components/transactionsPages/rowTransaction";
 
-export default function GetAllTransactions() {
-  const [transactions, setTransactions] = useState<TransactionsProps[]>([]);
+export default function PageTransactions() {
+  //Working with datas and filter:
+  const [transactions, setTransactions] = useState<Transactions[]>([]);
+  const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
+  const [transactionFiltered, setTransactionFiltered] = useState<
+    Transactions[]
+  >([]);
+  //const [listTransactions, setListTransactions] = useState(transactions);
+
+  useEffect(() => {
+    setTransactionFiltered(
+      filterTransactionsByMonth(transactions, currentMonth)
+    );
+  }, [transactions, currentMonth]);
 
   //Listing all transactions from database:
   useEffect(() => {
@@ -65,80 +75,13 @@ export default function GetAllTransactions() {
 
   return (
     <>
-      <h1 className="my-5 text-center text-2xl font-bold ">Todas Transações</h1>
-
-      <div className="flex justify-center">
-        {/* Type ====================================== */}
-        <label className="p-1">Navegue por mês: </label>
-        <select className="">
-          <option value="0"></option>
-          <option value="1">Janeiro</option>
-          <option value="2">Fevereiro</option>
-          <option value="3">Março</option>
-          <option value="4">Abril</option>
-          <option value="5">Maio</option>
-          <option value="6">Junho</option>
-          <option value="7">Julho</option>
-          <option value="8">Agosto</option>
-          <option value="9">Setembro</option>
-          <option value="10">Outubro</option>
-          <option value="11">Novembro</option>
-          <option value="12">Dezembro</option>
-        </select>
-        {/* End */}
+      <div className="text-center">
+        <AreaMonth />
+        <AreaBalanceMonth />
+        <AreaFilter />
+        <AreaTransactions />
+        <RowTransaction />
       </div>
-
-      <section className="flex flex-col mr-2 gap-5">
-        {transactions.map((transaction, id) => (
-          <div
-            key={transaction.id}
-            className="bg-blue-100 border border-indigo-900 m-5 p-5 
-            hover:scale-105 transition duration-500 hover:bg-blue-200 "
-          >
-            <article className=" rounded p-1 relative">
-              <p>
-                <span className="font-medium">Descrição: </span>
-                {transaction.description}
-              </p>
-              <p>
-                <span className="font-medium">Valor: R$ </span>
-                {transaction.amount}
-              </p>
-              <p>
-                <span className="font-medium">Data: </span>
-                {transaction.date}
-              </p>
-              <p>
-                <span className="font-medium">Tipo: </span>
-                {transaction.type}
-              </p>
-              <p>
-                <span className="font-medium">Forma de Pagamento: </span>
-                {transaction.payment}
-              </p>
-              <p>
-                <span className="font-medium">Categoria: </span>
-                {transaction.category}
-              </p>
-              <p>
-                <span className="font-medium">Detalhes: </span>
-                {transaction.details}
-              </p>
-              <p>
-                <span className="font-medium">Pago: </span>
-                {transaction.paid ? "Sim" : "Não"}
-              </p>
-
-              <button
-                className="rounded absolute right-0 bg-black p-2 top-0"
-                onClick={() => handleDelete(transaction.id)}
-              >
-                <FiTrash size={20} color="red" />
-              </button>
-            </article>
-          </div>
-        ))}
-      </section>
     </>
   );
 }
