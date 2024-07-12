@@ -5,20 +5,9 @@ import { AreaBalanceMonth } from "./areaBalanceMonths";
 type Props = {
   currentMonth: string;
   onMonthChange: (newMonth: string) => void;
-  balance: number;
-  incomes: number;
-  expenses: number;
-  investments: number;
 };
 
-export default function AreaMonth({
-  currentMonth,
-  onMonthChange,
-  balance,
-  incomes,
-  expenses,
-  investments,
-}: Props) {
+export default function AreaMonth({ currentMonth, onMonthChange }: Props) {
   //Last Month:
   const handlePrevMonth = () => {
     let [year, month] = currentMonth.split("-");
