@@ -41,14 +41,14 @@ export default function PageTransactions() {
         case 2: // Receita variável
           vi += transaction.amount;
           break;
-        case 3: // Investimento
-          inv += transaction.amount;
-          break;
-        case 4: // Despesa fixa
+        case 3: // Despesa fixa
           fe += transaction.amount;
           break;
-        case 5: // Receita fixa
+        case 4: //Receita fixa
           fi += transaction.amount;
+          break;
+        case 5: // Investimento
+          inv += transaction.amount;
           break;
         default:
           break;
