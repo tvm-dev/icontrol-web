@@ -1,23 +1,13 @@
-// Definição da interface para TransactionsProps comentada
-// interface TransactionsProps {
-//     id: string;
-//     description: string;
-//     amount: number;
-//     date: string;
-//     payment: string;
-//     category: string;
-//     type: number;
-//     details: string;
-//     paid: boolean;
-// }
+'use client'
 
 export type Transactions = {
     id: string;
     description: string;
     amount: number;
-    date: Date;
+    date: string; // Mudei para string, já que está vindo como string
     type: string;
     category: string;
+    month: string;
 };
 
 export const getCurrentMonth = (): string => {
@@ -26,31 +16,27 @@ export const getCurrentMonth = (): string => {
 };
 
 export const filterTransactionsByMonth = (transactions: Transactions[], date: string): Transactions[] => {
-    let newTransaction: Transactions[] = [];
+    let newListTransaction: Transactions[] = [];
     let [year, month] = date.split('-').map(Number); // Convertendo diretamente para número
+  
 
     for (let i in transactions) {
-        let transactionDate = transactions[i].date;
-
-        // Verificar se transactionDate é uma string e convertê-la para Date se necessário
-        if (typeof transactionDate === 'string' || typeof transactionDate === 'number') {
-            transactionDate = new Date(transactionDate);
-        }
+        const transactionDate = new Date(transactions[i].date); // Converter para Date
 
         // Verificar se transactionDate é um objeto Date válido
-        if (transactionDate instanceof Date && !isNaN(transactionDate.getTime())) {
+        if (!isNaN(transactionDate.getTime())) {
             if (
                 transactionDate.getFullYear() === year &&
                 (transactionDate.getMonth() + 1) === month
             ) {
-                newTransaction.push(transactions[i]);
+                newListTransaction.push(transactions[i]);
             }
         } else {
-            console.error('Invalid date:', transactionDate);
+            console.error('Invalid date:', transactions[i].date);
         }
     }
 
-    return newTransaction;
+    return newListTransaction;
 };
 
 
@@ -60,22 +46,20 @@ export const formatDateBr = (date: Date): string => {
         let month = date.getMonth()
         let day = date.getDate()
     
-        //return `${addZeroToDate(day)}/${addZeroToDate(month)}/${year} `    
+    //return `${addZeroToDate(day)}/${addZeroToDate(month)}/${year} `    
         return `${addZeroToDate(day)}` 
     
 }
     
 //function to add zero to left:
 const addZeroToDate = (n: number): string => n < 10 ? `0${n}` : `${n} `
-// {
-//     if (n < 10) {
-//         return `0${n}`
-//     } else {
-//         return `${n}`
-//     }
-// }
 
+export const formatCurrentMonth = (currentMonth: string): string => {
+    let [year, month] = currentMonth.split('-')
+    let allMonths = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
 
+    return ` ${allMonths[parseInt(month) - 1]} de ${year}`
+}
 
 
 
