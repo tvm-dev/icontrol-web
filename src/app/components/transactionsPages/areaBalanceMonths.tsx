@@ -33,12 +33,12 @@ export const AreaBalanceMonth = ({ ve, vi, fe, fi, inv }: Props) => {
         <div className="bg-red-500 px-2 rounded">
           {/* Expenses =======================================*/}
           <p>Despesas</p>
-          <p className="font-bold">-{formatCurrencyBRL(fe + ve)}</p>
+          <p className="font-bold">{formatCurrencyBRL(fe + ve)}</p>
         </div>
         <div className="bg-teal-600 px-2 rounded">
           {/* Investments =======================================*/}
           <p>Investimentos</p>
-          <p className="font-bold">-{formatCurrencyBRL(inv)}</p>
+          <p className="font-bold">{formatCurrencyBRL(inv)}</p>
         </div>
       </div>
     </>

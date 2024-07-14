@@ -24,6 +24,8 @@ export default function PageTransactions() {
   const [fixedExpenses, setFixedExpenses] = useState<number>(0);
   const [fixedIncomes, setFixedIncomes] = useState<number>(0);
   const [investments, setInvestments] = useState<number>(0);
+  // Estado para armazenar o tipo de filtro selecionado
+  const [filterType, setFilterType] = useState<string | null>(null);
 
   // Define a função calculateTotals
   const calculateTotals = (filteredTransactions: Transactions[]) => {
@@ -93,6 +95,7 @@ export default function PageTransactions() {
     }
   }, [transactionFiltered]);
 
+  //--------delete----------------
   const handleDelete = async (id: string) => {
     const isConfirmed = window.confirm(
       `Você realmente quer apagar esta transação? Não será mais possível recuperá-la!`
@@ -114,10 +117,21 @@ export default function PageTransactions() {
       console.error("Erro ao deletar transação:", error);
     }
   };
-
+  //change month-------------------------------------------
   const handleMonthChange = (newMonth: string) => {
     setCurrentMonth(newMonth);
   };
+
+  //filter by transactions type:-------------------------------
+  const handleFilterChange = (type: string | null) => {
+    setFilterType(type);
+  };
+
+  const filteredTransactions = filterType
+    ? transactionFiltered.filter(
+        (transaction) => transaction.type.toString() === filterType
+      )
+    : transactionFiltered;
 
   return (
     <div className="text-center">
@@ -132,7 +146,7 @@ export default function PageTransactions() {
         fi={fixedIncomes}
         inv={investments}
       />
-      <AreaFilter />
+      <AreaFilter onFilterChange={handleFilterChange} />
       <TableTransactions
         transactions={transactionFiltered}
         onDelete={handleDelete}
