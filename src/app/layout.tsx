@@ -4,6 +4,7 @@ import "./globals.css";
 
 import Header from "@/app/components/Shared/Header";
 import { title } from "process";
+import Footer from "./components/Shared/Footer";
 
 //const mainFontFamily = Ubuntu({ subsets: ["latin"] });
 const mainFontFamily = Roboto({
@@ -33,6 +34,8 @@ export default function RootLayout({
         <Header />
 
         {children}
+
+        {/* <Footer /> */}
       </body>
     </html>
   );
