@@ -5,11 +5,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatCurrencyBRL } from "@/utils/formatCurrencies";
 
-//Interfaces:
-// interface investmentsProps {
-//   sum: number;
-// }
-
 interface CurrencyComponentProps {
   amount: number;
 }
@@ -103,7 +98,7 @@ export default function Dashboad() {
       <div className="m-5">
         <div className="flex flex-row justify-between my-2 ">
           <h2 className="font-bold mt-2 ">Dashboad</h2>
-          <a href="/transactions/new">
+          <a href="/transactions/create">
             <h2 className="font-bold mt-2 cursor-pointer bg-red-300 p-2 m-2 rounded hover:bg-red-500 transition duration-300  ">
               + Nova Transação
             </h2>

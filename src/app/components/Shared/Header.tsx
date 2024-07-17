@@ -27,7 +27,7 @@ export default function Header() {
 
             <li>
               <a
-                href="transactions/new"
+                href="transactions/create"
                 className="bg-green-500 text-white  hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded "
               >
                 Criar Transação

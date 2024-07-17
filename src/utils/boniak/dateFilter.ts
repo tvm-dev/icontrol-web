@@ -1,6 +1,7 @@
 'use client'
 
 export type Transactions = {
+    paid: any;
     id: string;
     description: string;
     amount: number;
@@ -8,6 +9,10 @@ export type Transactions = {
     type: string;
     category: string;
     month: string;
+    payment: string;
+    details: string;
+    
+
 };
 
 export const getCurrentMonth = (): string => {
@@ -46,6 +51,7 @@ export const formatDateBr = (date: Date): string => {
         let month = date.getMonth()
         let day = date.getDate()
     
+    //return `${addZeroToDate(day)}/${addZeroToDate(month)} `    
     //return `${addZeroToDate(day)}/${addZeroToDate(month)}/${year} `    
         return `${addZeroToDate(day)}` 
     

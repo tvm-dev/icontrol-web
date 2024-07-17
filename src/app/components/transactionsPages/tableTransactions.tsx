@@ -7,7 +7,7 @@ import {
   formatDateBr,
 } from "@/utils/boniak/dateFilter";
 import { formatCurrencyBRL } from "@/utils/formatCurrencies";
-import { FcFullTrash } from "react-icons/fc";
+import { FcEditImage, FcFullTrash } from "react-icons/fc";
 
 type TableTransactionsProps = {
   transactions: Transactions[];
@@ -126,55 +126,45 @@ export default function TableTransactions({
     return dateB.getTime() - dateA.getTime();
   });
 
-  const handleRowClick = (id: string) => {
-    // Redirecionar para a página de edição da transação
-    window.location.href = `/edit/${id}`;
-  };
-
   return (
     <div className="flex justify-center overflow-x-hidden">
       <table className="min-w-full divide-y divide-gray-200">
         <tbody>
           {sortedDateKeys.map((dateKey) => (
             <React.Fragment key={dateKey}>
-              <tr></tr>
               {groupedTransactions[dateKey].map((transaction, index) => (
                 <tr
                   key={transaction.id}
                   className="group cursor-pointer hover:bg-blue-100"
-                  onClick={() => handleRowClick(transaction.id)}
                 >
                   {index === 0 && (
                     <td
-                      className="text-blue-900 font-bold p-2 text-5xl border-r-2 align-middle"
+                      className="text-blue-900 font-bold p-2 text-2xl border-r-2 align-middle"
                       rowSpan={groupedTransactions[dateKey].length}
                     >
                       {dateKey}
-                      <br />
+                      <hr />
                     </td>
                   )}
-                  <td className="border-b">
-                    {typeMapping[parseInt(transaction.type)]}
-                  </td>
-                  <td className="border-b">
-                    {categoryMapping[parseInt(transaction.category)]}
-                  </td>
-                  <td className="border-b border-gray-200 text-sm">
-                    {transaction.description}
-                  </td>
-                  <td className="border-b border-gray-200 text-sm">
-                    {formatCurrencyBRL(transaction.amount)}
-                  </td>
+                  <td>{typeMapping[parseInt(transaction.type)]}</td>
+                  <td>{categoryMapping[parseInt(transaction.category)]}</td>
+                  <td>{transaction.description}</td>
+                  <td>{formatCurrencyBRL(transaction.amount)}</td>
                   <td className="p-2 hover:bg-red-500">
                     <button
-                      className="font-thin mr-5"
+                      className=""
                       onClick={(e) => {
                         e.stopPropagation();
                         onDelete(transaction.id);
                       }}
                     >
-                      <FcFullTrash />
+                      <FcFullTrash size={25} />
                     </button>
+                  </td>
+                  <td className=" hover:bg-red-300 p-2">
+                    <Link href={`/transactions/edit/${transaction.id}`}>
+                      <FcEditImage title="Editar" size={25} />
+                    </Link>
                   </td>
                 </tr>
               ))}
