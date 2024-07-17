@@ -5,6 +5,7 @@ import { useEffect, useState, ChangeEvent, FormEvent, useRef } from "react";
 import axios from "axios";
 import { api } from "@/app/services/api";
 import { manualToken } from "@/app/services/token";
+import { useRouter } from "next/navigation";
 
 interface EditTransactionProps {
   id: string;
@@ -42,6 +43,7 @@ export default function EditTransaction({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,7 +106,8 @@ export default function EditTransaction({
         headers: { Authorization: `Bearer ${manualToken}` },
       });
 
-      alert(`Transação atualizada com sucesso: ${response.data}`);
+      alert("Transação atualizada com sucesso");
+      router.push("/transactions");
       console.log("Transação atualizada com sucesso:", response.data);
 
       // Aqui você pode adicionar lógica para atualizar o estado local ou redirecionar o usuário, se necessário.
@@ -128,7 +131,7 @@ export default function EditTransaction({
   return (
     <>
       <h1 className="font-bold text-2xl text-center text-blue-500 mt-2">
-        Editar Transação: {id}
+        Alterando Transação...
       </h1>
       <div className="w-full mb-2 p-2 rounded">
         <form
@@ -254,10 +257,18 @@ export default function EditTransaction({
             <input
               type="submit"
               value="Salvar"
-              className="cursor-pointer w-full bg-blue-400 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-500"
+              className="cursor-pointer w-full bg-blue-400 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-900"
             />
           )}
         </form>
+        <p className="mt-10 text-center w-full ">
+          <a
+            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded "
+            href="/transactions"
+          >
+            Cancelar
+          </a>
+        </p>
         {error && <p className="text-red-500 text-center">{error}</p>}
       </div>
     </>

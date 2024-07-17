@@ -15,10 +15,17 @@ export type Transactions = {
 
 };
 
+// export const getCurrentMonth = (): string => {
+//     let now = new Date();
+//     return `${now.getFullYear()}-${now.getMonth() + 1}`; // Mês começa em 0 no JS.
+// };
+
 export const getCurrentMonth = (): string => {
     let now = new Date();
+    now.setHours(now.getHours() - 3); // Subtrai 3 horas
     return `${now.getFullYear()}-${now.getMonth() + 1}`; // Mês começa em 0 no JS.
 };
+
 
 export const filterTransactionsByMonth = (transactions: Transactions[], date: string): Transactions[] => {
     let newListTransaction: Transactions[] = [];
