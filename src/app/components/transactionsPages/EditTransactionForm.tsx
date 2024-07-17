@@ -1,5 +1,5 @@
 "use client";
-//-----------------------------------------------------
+// //-----------------------------------------------------
 
 import { useEffect, useState, ChangeEvent, FormEvent, useRef } from "react";
 import axios from "axios";
@@ -82,8 +82,10 @@ export default function EditTransaction({
   const detailsRef = useRef<HTMLInputElement | null>(null);
   const statusRef = useRef<HTMLSelectElement | null>(null);
 
-  async function handleEditTransaction(event: FormEvent) {
+  const handleEditTransaction = async (event: FormEvent) => {
     event.preventDefault();
+
+    setIsLoading(true);
 
     const transactionData = {
       description: descriptionRef.current?.value || "",
@@ -93,29 +95,35 @@ export default function EditTransaction({
       payment: paymentRef.current?.value || "",
       category: categoryRef.current?.value || "",
       details: detailsRef.current?.value || "",
-      paid: statusRef.current?.value === "y" ? true : false,
+      paid: statusRef.current?.value === "1" ? true : false,
     };
 
-    console.log("Dados da transação:", transactionData);
-
     try {
-      // Add your API call to update the transaction here
-      // Example:
-      // const response = await api.put(`/transaction/${id}`, transactionData, {
-      //   headers: { Authorization: `Bearer ${manualToken}` },
-      // });
-      // Handle success or errors accordingly
+      const response = await api.put(`/transaction`, transactionData, {
+        params: { id },
+        headers: { Authorization: `Bearer ${manualToken}` },
+      });
+
+      alert(`Transação atualizada com sucesso: ${response.data}`);
+      console.log("Transação atualizada com sucesso:", response.data);
+
+      // Aqui você pode adicionar lógica para atualizar o estado local ou redirecionar o usuário, se necessário.
+
+      setIsLoading(false);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error(
           "Erro ao editar transação:",
           error.response?.data || error.message
         );
+        setError("Erro ao editar transação. Tente novamente mais tarde.");
       } else {
         console.error("Erro desconhecido:", error);
+        setError("Erro desconhecido. Tente novamente mais tarde.");
       }
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -240,12 +248,17 @@ export default function EditTransaction({
             className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <input
-            type="submit"
-            value="Salvar"
-            className="cursor-pointer w-full bg-blue-400 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-500"
-          />
+          {isLoading ? (
+            <p className="text-center my-4">Salvando alterações...</p>
+          ) : (
+            <input
+              type="submit"
+              value="Salvar"
+              className="cursor-pointer w-full bg-blue-400 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-500"
+            />
+          )}
         </form>
+        {error && <p className="text-red-500 text-center">{error}</p>}
       </div>
     </>
   );
