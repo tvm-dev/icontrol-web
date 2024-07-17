@@ -1,6 +1,5 @@
 "use client";
 // //-----------------------------------------------------
-
 import { useEffect, useState, ChangeEvent, FormEvent, useRef } from "react";
 import axios from "axios";
 import { api } from "@/app/services/api";
@@ -57,6 +56,7 @@ export default function EditTransaction({
 
         setFormData({
           ...data,
+          paid: !!data.paid, // Convertendo para booleano, se necessário
         });
       } catch (error) {
         setError("Falha ao carregar a transação solicitada!");
@@ -69,9 +69,11 @@ export default function EditTransaction({
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
+    const { name, value } = e.target;
+
     setFormData((prevData) => ({
       ...prevData,
-      [e.target.name]: e.target.value,
+      [name]: name === "paid" ? value === "true" : value,
     }));
   };
 
@@ -82,7 +84,6 @@ export default function EditTransaction({
   const paymentRef = useRef<HTMLSelectElement | null>(null);
   const categoryRef = useRef<HTMLSelectElement | null>(null);
   const detailsRef = useRef<HTMLInputElement | null>(null);
-  const statusRef = useRef<HTMLSelectElement | null>(null);
 
   const handleEditTransaction = async (event: FormEvent) => {
     event.preventDefault();
@@ -97,7 +98,7 @@ export default function EditTransaction({
       payment: paymentRef.current?.value || "",
       category: categoryRef.current?.value || "",
       details: detailsRef.current?.value || "",
-      paid: statusRef.current?.value === "1" ? true : false,
+      paid: formData.paid,
     };
 
     try {
@@ -109,8 +110,6 @@ export default function EditTransaction({
       alert("Transação atualizada com sucesso");
       router.push("/transactions");
       console.log("Transação atualizada com sucesso:", response.data);
-
-      // Aqui você pode adicionar lógica para atualizar o estado local ou redirecionar o usuário, se necessário.
 
       setIsLoading(false);
     } catch (error) {
@@ -227,16 +226,15 @@ export default function EditTransaction({
               </select>
             </div>
             <div className="flex flex-col w-1/2">
-              <label className="text-xs">Status</label>
+              <label className="text-xs">Pago:</label>
               <select
-                ref={statusRef}
-                name="status"
-                value={formData.paid ? "1" : "2"}
+                name="paid"
+                value={formData.paid ? "true" : "false"} // Converte booleano para string
                 onChange={handleInputChange}
                 className="border border-1 w-full mb-2 p-2 rounded"
               >
-                <option value="1">Pago</option>
-                <option value="2">Pendente</option>
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
               </select>
             </div>
           </div>
