@@ -27,23 +27,22 @@ export const getCurrentMonth = (): string => {
 };
 
 
-// Em utils/boniak/dateFilter.ts
-
 export const filterTransactionsByMonth = (transactions: Transactions[], date: string): Transactions[] => {
     let newListTransaction: Transactions[] = [];
-    let [year, month] = date.split('-').map(Number); // Convertendo diretamente para número
-  
+    let [year, month] = date.split('-').map(Number);
+
     for (let transaction of transactions) {
-        const transactionDate = parseDate(transaction.date); // Use parseDate
-    
+        const transactionDate = parseDate(transaction.date);
+
+        // Verifica se a transação está dentro do mês correto
         if (
-            transactionDate.getFullYear() === year &&
-            (transactionDate.getMonth() + 1) === month
+            transactionDate.getUTCFullYear() === year &&
+            transactionDate.getUTCMonth() + 1 === month
         ) {
             newListTransaction.push(transaction);
         }
     }
-  
+
     return newListTransaction;
 };
   

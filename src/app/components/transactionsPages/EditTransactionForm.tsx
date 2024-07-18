@@ -107,9 +107,9 @@ export default function EditTransaction({
         headers: { Authorization: `Bearer ${manualToken}` },
       });
 
-      alert("Transação atualizada com sucesso");
+      //alert("Transação atualizada com sucesso");
       router.push("/transactions");
-      console.log("Transação atualizada com sucesso:", response.data);
+      //console.log("Transação atualizada com sucesso:", response.data);
 
       setIsLoading(false);
     } catch (error) {

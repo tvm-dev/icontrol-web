@@ -5,6 +5,7 @@ import {
   getCurrentMonth,
   filterTransactionsByMonth,
   formatDateBr,
+  parseDate,
 } from "@/utils/boniak/dateFilter";
 import { formatCurrencyBRL } from "@/utils/formatCurrencies";
 import { FcEditImage, FcFullTrash } from "react-icons/fc";
@@ -110,7 +111,8 @@ export default function TableTransactions({
   // Adicionar cabeçalho de mês atual
   let currentHeader = "";
   transactions.forEach((transaction) => {
-    const dateKey = formatDateBr(new Date(transaction.date));
+    //const dateKey = formatDateBr(new Date(transaction.date));
+    const dateKey = formatDateBr(parseDate(transaction.date));
 
     // Adicionar cabeçalho de data se mudou
     if (dateKey !== currentHeader) {
