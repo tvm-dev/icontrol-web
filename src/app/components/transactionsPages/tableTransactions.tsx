@@ -120,7 +120,7 @@ export default function TableTransactions({
             colSpan={6}
             className="text-blue-500 font-semibold p-2 text-sm border-r-2 align-middle"
           >
-            📅 Dia {dateKey}
+            📅 {dateKey}
           </td>
         </tr>
       );

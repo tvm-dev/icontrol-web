@@ -51,27 +51,40 @@ export const filterTransactionsByMonth = (transactions: Transactions[], date: st
     return newListTransaction;
 };
 
-
-//function format date:
-export const formatDateBr = (date: Date): string => {
-    let year = date.getFullYear() % 100;
-        let month = date.getMonth()
-        let day = date.getDate()
-    
-    //return `${addZeroToDate(day)}/${addZeroToDate(month)} `    
-    //return `${addZeroToDate(day)}/${addZeroToDate(month)}/${year} `    
-        return `${addZeroToDate(day)}` 
-    
-}
-    
-//function to add zero to left:
-const addZeroToDate = (n: number): string => n < 10 ? `0${n}` : `${n} `
-
 export const formatCurrentMonth = (currentMonth: string): string => {
-    let [year, month] = currentMonth.split('-')
-    let allMonths = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+    let [year, month] = currentMonth.split('-');
+    let allMonths = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-    return ` ${allMonths[parseInt(month) - 1]} de ${year}`
+    return ` ${allMonths[parseInt(month) - 1]} de ${year}`;
+}
+
+
+
+export const formatDateBr = (date: Date): string => {
+    const day = addZeroToDate(date.getDate());
+    const month = addZeroToDate(date.getMonth() + 1); // Mês é baseado em zero, então adicionamos 1
+    const year = date.getFullYear();
+    const weekday = getWeekdayName(date.getDay()); // Obtém o nome do dia da semana
+    const monthName = getMonthName(date.getMonth()); // Obtém o nome do mês
+    
+    return `${weekday}, ${day} de ${monthName} de ${year}`;
+}
+
+// Função auxiliar para adicionar zero à esquerda, se necessário
+const addZeroToDate = (value: number): string => {
+    return value < 10 ? `0${value}` : `${value}`;
+}
+
+// Função auxiliar para obter o nome do dia da semana
+const getWeekdayName = (dayOfWeek: number): string => {
+    const weekdays = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+    return weekdays[dayOfWeek];
+}
+
+// Função auxiliar para obter o nome do mês
+const getMonthName = (month: number): string => {
+    const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    return months[month];
 }
 
 
