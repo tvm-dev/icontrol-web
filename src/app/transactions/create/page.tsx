@@ -95,20 +95,18 @@ export default function NewTransaction() {
             required
             className="border border-1 w-full mb-2 p-2 rounded  focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {/* End */}
-          {/* temp ----------------------------------------------------*/}
+
           <div className="flex items-center space-x-2  ">
             <div className="flex flex-col w-full">
               {/* Amount */}
               <label className="text-xs">Valor:</label>
               <input
                 ref={amountRef}
-                //defaultValue="55"
+                defaultValue="1"
                 type="number"
                 required
                 className="border border-1 w-full mb-2 p-2 rounded  focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {/* End */}
             </div>
             {/* Date */}
             <div className="flex flex-col w-full ">
@@ -119,7 +117,6 @@ export default function NewTransaction() {
                 type="date"
                 className="border border-1 w-full mb-2 p-2 rounded  focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {/* End */}
             </div>
           </div>
           {/* Type ====================================== */}
@@ -139,9 +136,7 @@ export default function NewTransaction() {
                 <option value="4">Receita Fixa</option>
                 <option value="5">Investimento</option>
               </select>
-              {/* End */}
             </div>
-            {/* End */}
 
             {/* Pago com */}
             <div className="flex flex-col w-1/2">
@@ -156,9 +151,7 @@ export default function NewTransaction() {
                 <option value="4">Dinheiro</option>
                 <option value="5">Outros</option>
               </select>
-              {/* End */}
             </div>
-            {/* End */}
           </div>
 
           {/* Category */}
@@ -191,7 +184,6 @@ export default function NewTransaction() {
                 <option value="19">Rendimentos</option>
                 <option value="20">Outros</option>
               </select>
-              {/* End */}
             </div>
 
             {/* Status */}
@@ -204,7 +196,6 @@ export default function NewTransaction() {
                 <option value="1">Pago</option>
                 <option value="2">Pendente</option>
               </select>
-              {/* End */}
             </div>
           </div>
 
@@ -215,14 +206,13 @@ export default function NewTransaction() {
             type="text"
             className="border border-1 w-full mb-2 p-2 rounded  focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {/* End */}
+
           {/* Button */}
           <input
             type="submit"
             value="Salvar Transação"
             className="cursor-pointer w-full bg-blue-400 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-500"
           />
-          {/* End */}
         </form>
       </div>
     </>
