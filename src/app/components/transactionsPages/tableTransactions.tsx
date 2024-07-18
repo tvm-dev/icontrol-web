@@ -59,9 +59,6 @@ export default function TableTransactions({
   updateTotals,
 }: TableTransactionsProps) {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
-  const [groupedTransactions, setGroupedTransactions] = useState<
-    Record<string, Transactions[]>
-  >({});
 
   useEffect(() => {
     const filtered = filterTransactionsByMonth(transactions, currentMonth);
@@ -70,18 +67,6 @@ export default function TableTransactions({
     filtered.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
-
-    // Agrupar transações por data (formato: AAAA-MM-DD)
-    const grouped: Record<string, Transactions[]> = {};
-    filtered.forEach((transaction) => {
-      const dateKey = formatDateBr(new Date(transaction.date));
-      if (!grouped[dateKey]) {
-        grouped[dateKey] = [];
-      }
-      grouped[dateKey].push(transaction);
-    });
-
-    setGroupedTransactions(grouped);
 
     // Calcular totais para todas as transações filtradas
     let ve = 0;
@@ -119,59 +104,63 @@ export default function TableTransactions({
     return <p className="py-5">Nenhuma transação encontrada!</p>;
   }
 
-  // Obter as chaves das datas das transações agrupadas
-  const sortedDateKeys = Object.keys(groupedTransactions).sort((a, b) => {
-    const dateA = new Date(a.split("/").reverse().join("-"));
-    const dateB = new Date(b.split("/").reverse().join("-"));
-    return dateB.getTime() - dateA.getTime();
+  // Array para armazenar os elementos JSX das transações
+  const transactionRows: JSX.Element[] = [];
+
+  // Adicionar cabeçalho de mês atual
+  let currentHeader = "";
+  transactions.forEach((transaction) => {
+    const dateKey = formatDateBr(new Date(transaction.date));
+
+    // Adicionar cabeçalho de data se mudou
+    if (dateKey !== currentHeader) {
+      transactionRows.push(
+        <tr key={dateKey} className="bg-gray-100">
+          <td
+            colSpan={6}
+            className="text-blue-500 font-semibold p-2 text-sm border-r-2 align-middle"
+          >
+            📅 Dia {dateKey}
+          </td>
+        </tr>
+      );
+      currentHeader = dateKey;
+    }
+
+    // Adicionar linha de transação
+    transactionRows.push(
+      <tr
+        key={transaction.id}
+        className="group cursor-pointer hover:bg-blue-100"
+      >
+        <td>{typeMapping[parseInt(transaction.type)]}</td>
+        <td>{categoryMapping[parseInt(transaction.category)]}</td>
+        <td>{transaction.description}</td>
+        <td>{formatCurrencyBRL(transaction.amount)}</td>
+        <td className="p-2 hover:bg-red-500">
+          <button
+            className=""
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(transaction.id);
+            }}
+          >
+            <FcFullTrash size={25} />
+          </button>
+        </td>
+        <td className=" hover:bg-red-300 p-2">
+          <Link href={`/transactions/edit/${transaction.id}`}>
+            <FcEditImage title="Editar" size={25} />
+          </Link>
+        </td>
+      </tr>
+    );
   });
 
   return (
     <div className="flex justify-center overflow-x-hidden">
       <table className="min-w-full divide-y divide-gray-200">
-        <tbody>
-          {sortedDateKeys.map((dateKey) => (
-            <React.Fragment key={dateKey}>
-              {groupedTransactions[dateKey].map((transaction, index) => (
-                <tr
-                  key={transaction.id}
-                  className="group cursor-pointer hover:bg-blue-100"
-                >
-                  {index === 0 && (
-                    <td
-                      className="text-blue-900 font-bold p-2 text-2xl border-r-2 align-middle"
-                      rowSpan={groupedTransactions[dateKey].length}
-                    >
-                      {dateKey}
-                      <hr />
-                    </td>
-                  )}
-                  <td>{typeMapping[parseInt(transaction.type)]}</td>
-                  <td>{categoryMapping[parseInt(transaction.category)]}</td>
-                  <td>{transaction.description}</td>
-                  <td>{formatCurrencyBRL(transaction.amount)}</td>
-                  <td className="p-2 hover:bg-red-500">
-                    <button
-                      className=""
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(transaction.id);
-                      }}
-                    >
-                      <FcFullTrash size={25} />
-                    </button>
-                  </td>
-                  <td className=" hover:bg-red-300 p-2">
-                    <Link href={`/transactions/edit/${transaction.id}`}>
-                      <FcEditImage title="Editar" size={25} />
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </React.Fragment>
-          ))}
-        </tbody>
-        <hr />
+        <tbody>{transactionRows}</tbody>
       </table>
     </div>
   );
