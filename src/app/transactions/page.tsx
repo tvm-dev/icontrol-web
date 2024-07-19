@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import AreaMonth from "../components/transactionsPages/areaMonths";
 import { AreaBalanceMonth } from "../components/transactionsPages/areaBalanceMonths";
 import AreaFilter from "../components/transactionsPages/areaFilters";
+import ParentComponent from "../components/ParentComponent";
 import TableTransactions from "../components/transactionsPages/tableTransactions";
 import {
   getCurrentMonth,
@@ -68,13 +69,13 @@ export default function PageTransactions() {
     const loadAllTransactions = async () => {
       try {
         const response = await api.get("/transactions", {
-          params: { userID: userID },
+          // params: { userID: userID },
           headers: { Authorization: `Bearer ${manualToken}` },
         });
-        console.log("API response:", response.data);
+        console.log("API response tvm ok:", response.data);
         setTransactions(response.data);
       } catch (error) {
-        console.error("Erro ao carregar transações:", error);
+        console.error("Erro ao carregar transações tvm problema:", error);
       }
     };
 
@@ -96,7 +97,8 @@ export default function PageTransactions() {
   }, [transactionFiltered]);
 
   //--------delete----------------
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
+    //alert(typeof id);
     const isConfirmed = window.confirm(
       `Você realmente quer apagar esta transação? Não será mais possível recuperá-la!`
     );
@@ -148,7 +150,8 @@ export default function PageTransactions() {
       />
       <AreaFilter onFilterChange={handleFilterChange} />
       <TableTransactions
-        transactions={transactionFiltered}
+        transactions={filteredTransactions}
+        filterType={filterType}
         onDelete={handleDelete}
         updateTotals={() => calculateTotals(transactionFiltered)} // Chama calculateTotals quando updateTotals é chamado
       />

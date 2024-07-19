@@ -1,15 +1,3 @@
-// interface TransactionsProps {
-//     id: string;
-//     description: string;
-//     amount: number;
-//     date: string;
-//     payment: string;
-//     category: string;
-//     type: number;
-//     details: string;
-//     paid: boolean;
-//   }
-
 export type Category = {
   [tag: string]: {
       title: string;

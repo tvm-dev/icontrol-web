@@ -1,5 +1,5 @@
 "use client";
-// //-----------------------------------------------------
+//-----------------------------------------------------
 import { useEffect, useState, ChangeEvent, FormEvent, useRef } from "react";
 import axios from "axios";
 import { api } from "@/app/services/api";
@@ -7,7 +7,7 @@ import { manualToken } from "@/app/services/token";
 import { useRouter } from "next/navigation";
 
 interface EditTransactionProps {
-  id: string;
+  id: number;
   description: string;
   amount: number;
   date: string;
@@ -26,8 +26,8 @@ export default function EditTransaction({
   type,
   payment,
   category,
-  details,
   paid,
+  details,
 }: EditTransactionProps) {
   const [formData, setFormData] = useState<EditTransactionProps>({
     id,
@@ -37,8 +37,8 @@ export default function EditTransaction({
     type,
     payment,
     category,
-    details,
     paid,
+    details,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,19 +46,24 @@ export default function EditTransaction({
 
   useEffect(() => {
     const fetchData = async () => {
+      //const idNUmber = parseInt(id as any, 10);
+      const idNumber = parseInt(id as any, 10);
+
       try {
         const response = await api.get(`/transaction`, {
-          params: { id },
+          params: { id: idNumber },
           headers: { Authorization: `Bearer ${manualToken}` },
         });
 
-        const data = response.data;
+        console.log("API Response:", response); // Verifique a resposta completa
+        console.log("Data:", response.data); // Verifique os dados específicos
 
         setFormData({
-          ...data,
-          paid: !!data.paid, // Convertendo para booleano, se necessário
+          ...response.data,
+          paid: !!response.data.paid, // Convertendo para booleano, se necessário
         });
       } catch (error) {
+        console.error("Erro ao carregar transação:", error);
         setError("Falha ao carregar a transação solicitada!");
       }
     };
@@ -107,9 +112,7 @@ export default function EditTransaction({
         headers: { Authorization: `Bearer ${manualToken}` },
       });
 
-      //alert("Transação atualizada com sucesso");
       router.push("/transactions");
-      //console.log("Transação atualizada com sucesso:", response.data);
 
       setIsLoading(false);
     } catch (error) {

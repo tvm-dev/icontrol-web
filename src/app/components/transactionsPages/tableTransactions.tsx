@@ -12,7 +12,7 @@ import { FcEditImage, FcFullTrash } from "react-icons/fc";
 
 type TableTransactionsProps = {
   transactions: Transactions[];
-  onDelete: (id: string) => void;
+  onDelete: (id: number) => void;
   updateTotals: (
     ve: number,
     vi: number,
@@ -20,10 +20,11 @@ type TableTransactionsProps = {
     fi: number,
     inv: number
   ) => void;
+  filterType: string | null; // Adicionado
 };
 
 const typeMapping: Record<number, string> = {
-  1: "😒 DV",
+  1: "😥 DV",
   2: "😍 RV",
   3: "😿 DF",
   4: "🤑 RF",
@@ -34,11 +35,18 @@ export default function TableTransactions({
   transactions,
   onDelete,
   updateTotals,
+  filterType, // Adicionado
 }: TableTransactionsProps) {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
 
   useEffect(() => {
-    const filtered = filterTransactionsByMonth(transactions, currentMonth);
+    let filtered = filterTransactionsByMonth(transactions, currentMonth);
+
+    if (filterType !== null) {
+      filtered = filtered.filter(
+        (transaction) => transaction.type === filterType
+      );
+    }
 
     // Ordenar transações por data decrescente
     filtered.sort(
@@ -75,7 +83,7 @@ export default function TableTransactions({
     }
 
     updateTotals(ve, vi, fe, fi, inv);
-  }, [transactions, currentMonth, updateTotals]);
+  }, [transactions, currentMonth, updateTotals, filterType]); // Adicionado filterType
 
   if (!transactions || transactions.length === 0) {
     return <p className="py-5">Nenhuma transação encontrada!</p>;

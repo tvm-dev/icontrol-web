@@ -1,4 +1,5 @@
 import React from "react";
+import ParentComponent from "../ParentComponent";
 
 type AreaFilterProps = {
   onFilterChange: (type: string | null) => void;

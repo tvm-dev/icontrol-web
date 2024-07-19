@@ -2,7 +2,7 @@
 
 export type Transactions = {
     paid: any;
-    id: string;
+    id: number;
     description: string;
     amount: number;
     date: string; // Mudei para string, já que está vindo como string

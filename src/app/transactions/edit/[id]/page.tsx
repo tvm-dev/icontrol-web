@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 
 interface EditTransactionProps {
   params: {
-    id: string;
+    id: number;
     description: string;
     amount: number;
     date: string;

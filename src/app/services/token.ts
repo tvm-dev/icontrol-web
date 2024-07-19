@@ -1,4 +1,4 @@
-export const manualToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2OTlhYzgwZDdkODc4MDczZTcxYThjZSIsImlhdCI6MTcyMTM0NzIwOSwiZXhwIjoxNzIzOTM5MjA5fQ.jXQtTCrkn2wVkDkC0o-H0-flJvfCnSFeLHuI9foQ-Y4'
+export const manualToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzIxNDA1NjI3LCJleHAiOjE3MjM5OTc2Mjd9.XwnTpowoCKkkskAx2rZJR4FyhOSz8H0kX1j2dhVI0DE'
 
 //senadorx@gmail.com user:
-export const userID = '6699ac80d7d878073e71a8ce'
+export const userID = 1;

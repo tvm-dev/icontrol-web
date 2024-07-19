@@ -4,6 +4,7 @@ import { api } from "../services/api";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatCurrencyBRL } from "@/utils/formatCurrencies";
+import Greeting from "@/utils/greetings";
 
 interface CurrencyComponentProps {
   amount: number;
@@ -105,10 +106,11 @@ export default function Dashboad() {
           </a>
         </div>
 
-        {/* full Name */}
-        <div className="text-center bg-slate-300 p-2 rounded">
+        {/* User Name */}
+        <div className="text-center bg-blue-50 p-2 rounded">
           <h2 className="text-center">
-            Olá <span className="font-bold">Thiago</span>, Bom dia ☀️
+            {/* Olá <span className="font-bold">Thiago</span>, Bom dia ☀️ */}
+            <Greeting />
           </h2>
         </div>
         {/* Months */}

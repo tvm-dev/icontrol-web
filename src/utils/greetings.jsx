@@ -1,26 +1,60 @@
-export default function Greetings() {
-  const now = new Date();
-  const hours = now.getHours();
+"use client";
 
-  if (hours > 0 && hours < 0) {
-  }
-}
+import React, { useState, useEffect } from "react";
 
-// const Greeting = () => {
-//   // Obtém a hora atual do servidor
-//   const now = new Date();
-//   const hours = now.getHours();
+const Greeting = () => {
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-//   // Define a saudação com base na hora atual
-//   const greeting = hours < 12 ? 'Bom dia' : 'Boa tarde';
+  useEffect(() => {
+    const updateTime = () => {
+      setCurrentTime(new Date());
+    };
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-//   return <div className="text-xl font-bold">{greeting}</div>;
-// };
+  const getGreeting = () => {
+    const hours = currentTime.getHours();
+    if (hours >= 6 && hours < 12) {
+      return "Bom dia! ☀️";
+    } else if (hours >= 12 && hours < 18) {
+      return "Boa tarde! 🕘";
+    } else if (hours >= 18 && hours < 24) {
+      return "Boa noite! 🌚";
+    } else {
+      return "Boa madrugada! 🛌";
+    }
+  };
 
-//export default function Home() {
-//   return (
-//     <div className="p-4">
-//       <Greeting />
-//     </div>
-//   );
-// }
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  const cleanDayOfWeek = (day) => {
+    // Remove "feira" e hífens se existirem
+    return day.replace(/feira/g, "").replace(/-$/, "").trim();
+  };
+
+  const getDateInfo = () => {
+    const dayOfWeek = cleanDayOfWeek(
+      currentTime.toLocaleDateString("pt-BR", { weekday: "long" })
+    );
+    const dayOfMonth = currentTime.getDate();
+    const month = capitalizeFirstLetter(
+      currentTime.toLocaleDateString("pt-BR", { month: "long" })
+    );
+
+    return `${dayOfWeek}, ${dayOfMonth} de ${month}`;
+  };
+
+  return (
+    <div>
+      <h1 className="font-thin">
+        Olá<span className="font-bold"> Paloma</span>, {getGreeting()} Hoje é{" "}
+        {getDateInfo()}.
+      </h1>
+    </div>
+  );
+};
+
+export default Greeting;
