@@ -1,8 +1,16 @@
-// src/components/DependentDropdown.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { data } from "./data";
+
+// Mapeamento dos tipos para seus valores numéricos
+export const typeMapping: { [key: string]: number } = {
+  "Despesa Variável": 1,
+  "Receita Variável": 2,
+  "Despesa Fixa": 3,
+  "Receita Fixa": 4,
+  Investimentos: 5,
+};
 
 interface DependentDropdownProps {
   selectedType: string;
@@ -11,19 +19,19 @@ interface DependentDropdownProps {
   setSelectedCategory: (category: string) => void;
 }
 
-const DependentDropdown: React.FC<DependentDropdownProps> = ({
+const DependentDropdown = ({
   selectedType,
   setSelectedType,
   selectedCategory,
   setSelectedCategory,
-}) => {
+}: DependentDropdownProps) => {
   const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
     const typeData = data.transactionsType.find((t) => t.type === selectedType);
     setCategories(typeData ? typeData.categories : []);
     setSelectedCategory(""); // Limpa a categoria selecionada
-  }, [selectedType, setSelectedCategory]); // Adiciona setSelectedCategory à lista de dependências
+  }, [selectedType, setSelectedCategory]);
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedType(event.target.value);

@@ -5,7 +5,9 @@ import { api } from "@/app/services/api";
 import { manualToken, userID } from "@/app/services/token";
 import axios from "axios";
 import { FormEvent, useRef, useEffect, useState } from "react";
-import DependentDropdown from "@/app/components/DropDownMenu/Menu";
+import DependentDropdown, {
+  typeMapping,
+} from "@/app/components/DropDownMenu/Menu";
 
 export default function NewTransaction() {
   const descriptionRef = useRef<HTMLInputElement | null>(null);
@@ -18,13 +20,13 @@ export default function NewTransaction() {
   const [selectedType, setSelectedType] = useState("Despesa Variável");
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  const typeMapping: { [key: string]: number } = {
-    "Despesa Variável": 1,
-    "Receita Variável": 2,
-    "Despesa Fixa": 3,
-    "Receita Fixa": 4,
-    Investimento: 5,
-  };
+  // const typeMapping: { [key: string]: number } = {
+  //   "Despesa Variável": 1,
+  //   "Receita Variável": 2,
+  //   "Despesa Fixa": 3,
+  //   "Receita Fixa": 4,
+  //   Investimento: 5,
+  // };
 
   async function handleRegisterTransaction(event: FormEvent) {
     event.preventDefault();
