@@ -5,5 +5,5 @@ export const api = axios.create({
     
 })
 
-export const token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2N2Y1NDQxOWIxYTViZTIyNzc2ODQxOSIsImlhdCI6MTcxOTY5NjA1OSwiZXhwIjoxNzE5NzgyNDU5fQ.9Owug7pC3snYVA9Sp7aWK2sv7d8i-Qd3Mdr8p5PNYZg";
+// export const token =
+//       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2OTlhMzI5Mzc5MWM3YTQ5MDRiODZmNCIsImlhdCI6MTcyMTM0NDgyNSwiZXhwIjoxNzIzOTM2ODI1fQ.kHVYNIhue9t-rr9W_l5nHguLCvt3H8rmwGfPyTioPmg";

@@ -1,40 +1,48 @@
+// src/pages/NewTransaction.tsx
 "use client";
-//-----------------------------------------------------
 
 import { api } from "@/app/services/api";
-import { manualToken } from "@/app/services/token";
+import { manualToken, userID } from "@/app/services/token";
 import axios from "axios";
-import { FormEvent, useRef, useEffect } from "react";
+import { FormEvent, useRef, useEffect, useState } from "react";
+import DependentDropdown from "@/app/components/DropDownMenu/Menu";
 
 export default function NewTransaction() {
   const descriptionRef = useRef<HTMLInputElement | null>(null);
   const amountRef = useRef<HTMLInputElement | null>(null);
   const dateRef = useRef<HTMLInputElement | null>(null);
-  const typeRef = useRef<HTMLSelectElement | null>(null);
   const paymentRef = useRef<HTMLSelectElement | null>(null);
-  const categoryRef = useRef<HTMLSelectElement | null>(null);
   const detailsRef = useRef<HTMLInputElement | null>(null);
   const statusRef = useRef<HTMLSelectElement | null>(null);
+
+  const [selectedType, setSelectedType] = useState("Despesa Variável");
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const typeMapping: { [key: string]: number } = {
+    "Despesa Variável": 1,
+    "Receita Variável": 2,
+    "Despesa Fixa": 3,
+    "Receita Fixa": 4,
+    Investimento: 5,
+  };
 
   async function handleRegisterTransaction(event: FormEvent) {
     event.preventDefault();
 
     const transactionData = {
       description: descriptionRef.current?.value || "",
-      amount: parseFloat(amountRef.current?.value || "0"), // Garantir que é um número
+      amount: parseFloat(amountRef.current?.value || "0"),
       date: dateRef.current?.value || "",
-      type: parseFloat(typeRef.current?.value || "0"), // Garantir que é um número
       payment: paymentRef.current?.value || "",
-      category: categoryRef.current?.value || "",
       details: detailsRef.current?.value || "",
-      paid: statusRef.current?.value === "y" ? true : false,
+      paid: statusRef.current?.value === "1",
+      type: typeMapping[selectedType] || 0,
+      category: selectedCategory,
     };
-
-    //console.log("Dados da transação:", transactionData);
 
     try {
       const response = await api.post("/transaction", transactionData, {
-        params: { userID: "667f54419b1a5be227768419" },
+        params: { userID: userID },
         headers: { Authorization: `Bearer ${manualToken}` },
       });
 
@@ -42,8 +50,6 @@ export default function NewTransaction() {
         alert("Transação Criada com Sucesso!");
         window.location.href = "/transactions";
       }
-
-      //console.log("Resposta do servidor:", response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error(
@@ -57,14 +63,11 @@ export default function NewTransaction() {
   }
 
   useEffect(() => {
-    // Adicionando atributos apenas no lado do cliente para evitar discrepâncias
     const elements = [
       descriptionRef.current,
       amountRef.current,
       dateRef.current,
-      typeRef.current,
       paymentRef.current,
-      categoryRef.current,
       detailsRef.current,
       statusRef.current,
     ];
@@ -93,11 +96,11 @@ export default function NewTransaction() {
             ref={descriptionRef}
             type="text"
             required
-            className="border border-1 w-full mb-2 p-2 rounded  focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <div className="flex items-center space-x-2  ">
-            <div className="flex flex-col w-full">
+          <div className="flex items-center space-x-2">
+            <div className="flex flex-col w-1/2">
               {/* Amount */}
               <label className="text-xs">Valor:</label>
               <input
@@ -105,40 +108,31 @@ export default function NewTransaction() {
                 defaultValue="1"
                 type="number"
                 required
-                className="border border-1 w-full mb-2 p-2 rounded  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             {/* Date */}
-            <div className="flex flex-col w-full ">
+            <div className="flex flex-col w-1/2">
               <label className="text-xs">Data:</label>
               <input
                 ref={dateRef}
                 required
                 type="date"
-                className="border border-1 w-full mb-2 p-2 rounded  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
-          {/* Type ====================================== */}
 
-          {/* temp ----------------------------------------------------*/}
+          {/* Dependent Dropdown */}
+          <DependentDropdown
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+          />
+
+          {/* Payment and Status */}
           <div className="flex items-center space-x-2">
-            {/* Tipo */}
-            <div className="flex flex-col w-1/2">
-              <label className="text-xs">Tipo:</label>
-              <select
-                ref={typeRef}
-                className="border border-1 mb-2 p-2 rounded w-full"
-              >
-                <option value="1">Despesa Variável</option>
-                <option value="2">Receita Variável</option>
-                <option value="3">Despesa Fixa</option>
-                <option value="4">Receita Fixa</option>
-                <option value="5">Investimento</option>
-              </select>
-            </div>
-
-            {/* Pago com */}
             <div className="flex flex-col w-1/2">
               <label className="text-xs">Pago com:</label>
               <select
@@ -152,41 +146,7 @@ export default function NewTransaction() {
                 <option value="5">Outros</option>
               </select>
             </div>
-          </div>
 
-          {/* Category */}
-
-          <div className="flex items-center space-x-2">
-            <div className="flex flex-col w-1/2">
-              <label className="text-xs">Categoria:</label>
-              <select
-                ref={categoryRef}
-                className="border border-1 w-full mb-2 p-2 rounded"
-              >
-                <option value="1">Habitação</option>
-                <option value="2">Transporte</option>
-                <option value="3">Alimentação</option>
-                <option value="4">Saúde</option>
-                <option value="5">Educação</option>
-                <option value="6">Lazer</option>
-                <option value="7">Vestuário</option>
-                <option value="8">Comunicação</option>
-                <option value="9">Seguros</option>
-                <option value="10">Impostos e Taxas</option>
-                <option value="11">Dívidas e Empréstimos</option>
-                <option value="12">Presentes e Doações</option>
-                <option value="13">Despesas Pessoais</option>
-                <option value="14">Animais de Estimação</option>
-                <option value="15"> --- </option>
-                <option value="16">Salário</option>
-                <option value="17">Auxilios</option>
-                <option value="18">Vendas</option>
-                <option value="19">Rendimentos</option>
-                <option value="20">Outros</option>
-              </select>
-            </div>
-
-            {/* Status */}
             <div className="flex flex-col w-1/2">
               <label className="text-xs">Status</label>
               <select
@@ -204,7 +164,7 @@ export default function NewTransaction() {
           <input
             ref={detailsRef}
             type="text"
-            className="border border-1 w-full mb-2 p-2 rounded  focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           {/* Button */}

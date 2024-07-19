@@ -11,7 +11,7 @@ import {
   Transactions,
 } from "@/utils/boniak/dateFilter";
 import { api } from "@/app/services/api";
-import { manualToken } from "@/app/services/token";
+import { manualToken, userID } from "@/app/services/token";
 
 export default function PageTransactions() {
   const [currentMonth, setCurrentMonth] = useState<string>(getCurrentMonth());
@@ -68,7 +68,7 @@ export default function PageTransactions() {
     const loadAllTransactions = async () => {
       try {
         const response = await api.get("/transactions", {
-          params: { userID: "667f54419b1a5be227768419" },
+          params: { userID: userID },
           headers: { Authorization: `Bearer ${manualToken}` },
         });
         console.log("API response:", response.data);

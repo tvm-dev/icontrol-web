@@ -30,30 +30,6 @@ const typeMapping: Record<number, string> = {
   5: "💹 Inv",
 };
 
-const categoryMapping: Record<number, string> = {
-  1: "Habitação",
-  2: "Transporte",
-  3: "Alimentação",
-  4: "Saúde",
-  5: "Educação",
-  6: "Lazer",
-  7: "Vestuário",
-  8: "Comunicação",
-  9: "Seguros",
-  10: "Impostos e Taxas",
-  11: "Dívidas e Empréstimos",
-  12: "Presentes e Doações",
-  13: "Despesas Pessoais",
-  14: "Animais de Estimação",
-  15: " --- ",
-  16: "Salário",
-  17: "Auxilios",
-  18: "Vendas",
-  19: "Rendimentos",
-  20: "Investimentos",
-  21: "Outros",
-};
-
 export default function TableTransactions({
   transactions,
   onDelete,
@@ -136,7 +112,7 @@ export default function TableTransactions({
         className="group cursor-pointer hover:bg-blue-100"
       >
         <td>{typeMapping[parseInt(transaction.type)]}</td>
-        <td>{categoryMapping[parseInt(transaction.category)]}</td>
+        <td>{transaction.category}</td>
         <td>{transaction.description}</td>
         <td>{formatCurrencyBRL(transaction.amount)}</td>
         <td className="p-2 hover:bg-red-500">
