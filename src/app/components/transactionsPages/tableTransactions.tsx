@@ -28,7 +28,7 @@ const typeMapping: Record<number, string> = {
   2: "😍 RV",
   3: "😿 DF",
   4: "🤑 RF",
-  5: "💹 Inv",
+  5: "💹 In",
 };
 
 export default function TableTransactions({

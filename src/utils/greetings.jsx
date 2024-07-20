@@ -16,13 +16,13 @@ const Greeting = () => {
   const getGreeting = () => {
     const hours = currentTime.getHours();
     if (hours >= 6 && hours < 12) {
-      return "Bom dia! ☀️";
+      return "Bom dia! ☀️ - ";
     } else if (hours >= 12 && hours < 18) {
-      return "Boa tarde! 🕘";
+      return "Boa tarde! 🕘 - ";
     } else if (hours >= 18 && hours < 24) {
-      return "Boa noite! 🌚";
+      return "Boa noite! 🌜- ";
     } else {
-      return "Boa madrugada! 🛌";
+      return "Boa madrugada! 🛌 - ";
     }
   };
 
