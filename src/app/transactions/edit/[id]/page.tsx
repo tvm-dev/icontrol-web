@@ -5,7 +5,7 @@ import axios from "axios";
 import { api } from "@/app/services/api";
 import { manualToken } from "@/app/services/token";
 import { useRouter } from "next/navigation";
-import DependentDropdown from "@/app/components/DropDownMenu/Menu";
+import Link from "next/link";
 
 interface EditTransactionProps {
   id: number;
@@ -19,6 +19,124 @@ interface EditTransactionProps {
   paid: boolean;
 }
 
+const typeMapping: { [key: string]: number } = {
+  "Despesa Variável": 1,
+  "Receita Variável": 2,
+  "Despesa Fixa": 3,
+  "Receita Fixa": 4,
+  Investimentos: 5,
+};
+
+const reverseTypeMapping: { [key: number]: string } = Object.fromEntries(
+  Object.entries(typeMapping).map(([key, value]) => [value, key])
+);
+
+const data = {
+  transactionsType: [
+    {
+      type: "Despesa Variável",
+      categories: ["Alimentação", "Transporte", "Lazer"],
+    },
+    {
+      type: "Receita Variável",
+      categories: ["Freelance", "Vendas"],
+    },
+    {
+      type: "Despesa Fixa",
+      categories: ["Aluguel", "Internet", "Energia"],
+    },
+    {
+      type: "Receita Fixa",
+      categories: ["Salário"],
+    },
+    {
+      type: "Investimentos",
+      categories: ["Ações", "Fundos Imobiliários"],
+    },
+  ],
+};
+
+const DependentDropdown = ({
+  selectedType,
+  setSelectedType,
+  selectedCategory,
+  setSelectedCategory,
+}: {
+  selectedType: number;
+  setSelectedType: (type: number) => void;
+  selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
+}) => {
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    const typeString = reverseTypeMapping[selectedType];
+    const typeData = data.transactionsType.find((t) => t.type === typeString);
+    if (typeData) {
+      setCategories(typeData.categories);
+    } else {
+      setCategories([]);
+    }
+    setSelectedCategory("");
+  }, [selectedType, setSelectedCategory]);
+
+  const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const typeString = event.target.value;
+    const typeNumber = typeMapping[typeString as keyof typeof typeMapping];
+    setSelectedType(typeNumber);
+
+    const typeData = data.transactionsType.find((t) => t.type === typeString);
+    if (typeData) {
+      setCategories(typeData.categories);
+    } else {
+      setCategories([]);
+    }
+  };
+
+  const handleCategoryChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setSelectedCategory(event.target.value);
+  };
+
+  return (
+    <div className="flex items-center space-x-2">
+      <div className="flex flex-col w-1/2">
+        <label className="text-xs">Tipo:</label>
+        <select
+          value={reverseTypeMapping[selectedType] || ""}
+          onChange={handleTypeChange}
+          className="border border-1 mb-2 p-2 rounded w-full"
+        >
+          <option value="">Selecione</option>
+          {Object.keys(typeMapping).map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col w-1/2">
+        <label className="text-xs">Categoria:</label>
+        <select
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          disabled={!selectedType}
+          className="border border-1 mb-2 p-2 rounded w-full"
+        >
+          <option value="">Selecione</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+};
+
 export default function EditTransactionPage({
   params,
 }: {
@@ -27,7 +145,7 @@ export default function EditTransactionPage({
   const [formData, setFormData] = useState<EditTransactionProps | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   const router = useRouter();
@@ -35,11 +153,9 @@ export default function EditTransactionPage({
   const descriptionRef = useRef<HTMLInputElement | null>(null);
   const amountRef = useRef<HTMLInputElement | null>(null);
   const dateRef = useRef<HTMLInputElement | null>(null);
-  const typeRef = useRef<HTMLSelectElement | null>(null);
   const paymentRef = useRef<HTMLSelectElement | null>(null);
-  const categoryRef = useRef<HTMLSelectElement | null>(null);
   const statusRef = useRef<HTMLSelectElement | null>(null);
-  const detailsRef = useRef<HTMLInputElement | null>(null);
+  const detailsRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,7 +174,7 @@ export default function EditTransactionPage({
           category: response.data.category,
         });
 
-        setSelectedType(response.data.type.toString());
+        setSelectedType(response.data.type);
         setSelectedCategory(response.data.category);
       } catch (error) {
         console.error("Erro ao carregar transação:", error);
@@ -76,10 +192,14 @@ export default function EditTransactionPage({
   ) => {
     const { name, value } = e.target;
 
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: name === "paid" ? value === "true" : value,
-    }));
+    setFormData((prevData) => {
+      if (!prevData) return null;
+
+      return {
+        ...prevData,
+        [name]: name === "paid" ? value === "true" : value,
+      };
+    });
   };
 
   const handleEditTransaction = async (event: FormEvent) => {
@@ -91,9 +211,9 @@ export default function EditTransactionPage({
       description: descriptionRef.current?.value || "",
       amount: parseFloat(amountRef.current?.value || "0"),
       date: dateRef.current?.value || "",
-      type: parseFloat(typeRef.current?.value || "0"),
+      type: selectedType,
       payment: paymentRef.current?.value || "",
-      category: categoryRef.current?.value || "",
+      category: selectedCategory,
       details: detailsRef.current?.value || "",
       paid: formData?.paid || false,
     };
@@ -171,10 +291,11 @@ export default function EditTransactionPage({
             value={formData.description}
             onChange={handleInputChange}
             required
-            className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-1 mb-2 p-2 rounded"
           />
-          <div className="flex items-center space-x-2">
-            <div className="flex flex-col w-full">
+
+          <div className="flex space-x-2">
+            <div className="flex flex-col w-1/2">
               <label className="text-xs">Valor:</label>
               <input
                 ref={amountRef}
@@ -183,10 +304,11 @@ export default function EditTransactionPage({
                 value={formData.amount}
                 onChange={handleInputChange}
                 required
-                className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-1 mb-2 p-2 rounded"
               />
             </div>
-            <div className="flex flex-col w-full">
+
+            <div className="flex flex-col w-1/2">
               <label className="text-xs">Data:</label>
               <input
                 ref={dateRef}
@@ -195,8 +317,43 @@ export default function EditTransactionPage({
                 value={formData.date}
                 onChange={handleInputChange}
                 required
-                className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-1 mb-2 p-2 rounded"
               />
+            </div>
+          </div>
+
+          <div className="flex space-x-2">
+            <div className="flex flex-col w-1/2">
+              <label className="text-xs">Forma de Pagamento:</label>
+              <select
+                ref={paymentRef}
+                name="payment"
+                value={formData.payment}
+                onChange={handleInputChange}
+                required
+                className="border border-1 mb-2 p-2 rounded w-full"
+              >
+                <option value="">Selecione</option>
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="Crédito">Crédito</option>
+                <option value="Débito">Débito</option>
+                <option value="PIX">PIX</option>
+                <option value="Boleto">Boleto</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col w-1/2">
+              <label className="text-xs">Status:</label>
+              <select
+                ref={statusRef}
+                name="paid"
+                value={formData.paid.toString()}
+                onChange={handleInputChange}
+                className="border border-1 mb-2 p-2 rounded w-full"
+              >
+                <option value="true">Pago</option>
+                <option value="false">Pendente</option>
+              </select>
             </div>
           </div>
 
@@ -206,71 +363,40 @@ export default function EditTransactionPage({
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
           />
-          <div className="flex items-center space-x-2">
-            <div className="flex flex-col w-1/2">
-              <label className="text-xs">Pago com:</label>
-              <select
-                ref={paymentRef}
-                className="border border-1 mb-2 p-2 rounded w-full"
-                defaultValue={formData.payment}
-              >
-                <option value="1">Débito</option>
-                <option value="2">Crédito</option>
-                <option value="3">Pix</option>
-                <option value="4">Dinheiro</option>
-                <option value="5">Outros</option>
-              </select>
-            </div>
 
-            <div className="flex flex-col w-1/2">
-              <label className="text-xs">Status</label>
-              <select
-                ref={statusRef}
-                className="border border-1 w-full mb-2 p-2 rounded"
-                defaultValue={formData.paid ? "1" : "2"}
-              >
-                <option value="1">Pago</option>
-                <option value="2">Pendente</option>
-              </select>
-            </div>
-          </div>
           <label className="text-xs">Detalhes:</label>
-          <input
+          <textarea
             ref={detailsRef}
-            type="text"
             name="details"
             value={formData.details}
             onChange={handleInputChange}
-            className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-1 mb-2 p-2 rounded"
           />
-          {isLoading ? (
-            <p className="text-center my-4">Salvando alterações...</p>
-          ) : (
-            <>
-              <input
-                type="submit"
-                value="Salvar"
-                className="cursor-pointer w-full bg-blue-400 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-900"
-              />
-              <button
-                type="button"
-                onClick={handleDeleteTransaction}
-                className="mt-4 cursor-pointer w-full bg-red-500 rounded font-bold p-3 text-white hover:bg-red-700 transition duration-900"
-              >
-                Excluir Transação
-              </button>
-            </>
-          )}
-        </form>
-        <p className="mt-10 text-center w-full">
-          <a
-            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+
+          <div className="flex flex-col space-y-2">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded w-full"
+            >
+              {isLoading ? "Salvando..." : "Salvar"}
+            </button>
+            <button
+              type="button"
+              onClick={handleDeleteTransaction}
+              disabled={isLoading}
+              className="bg-red-500 hover:bg-red-600 text-white p-2 rounded"
+            >
+              {isLoading ? "Excluindo..." : "Excluir"}
+            </button>
+          </div>
+          <Link
             href="/transactions"
+            className="text-blue-500 text-center mt-10 border-b-2"
           >
-            Cancelar
-          </a>
-        </p>
-        {error && <p className="text-red-500 text-center">{error}</p>}
+            Voltar para todas as transações
+          </Link>
+        </form>
       </div>
     </>
   );

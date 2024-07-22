@@ -4,6 +4,7 @@ import { api } from "@/app/services/api";
 import { manualToken, userID } from "@/app/services/token";
 import axios from "axios";
 import { FormEvent, useRef, useEffect, useState } from "react";
+import { data } from "@/app/components/DropDownMenu/data";
 
 // Mapeamento dos tipos para seus valores numéricos
 const typeMapping: { [key: string]: number } = {
@@ -18,92 +19,6 @@ const typeMapping: { [key: string]: number } = {
 const reverseTypeMapping: { [key: number]: string } = Object.fromEntries(
   Object.entries(typeMapping).map(([key, value]) => [value, key])
 );
-
-const data = {
-  transactionsType: [
-    {
-      type: "Despesa Variável",
-      categories: [
-        "Restaurante",
-        "Sorveteria",
-        "Lanches",
-        "Educação",
-        "Transporte",
-        "Farmácia",
-        "Reparos em Casa",
-        "Lazer",
-        "Viagens",
-        "Presentes",
-        "Outros",
-      ],
-    },
-    {
-      type: "Receita Variável",
-      categories: [
-        "Freelancer",
-        "Serviços",
-        "Vendas",
-        "Dividendos",
-        "Comissões",
-        "Divisão de Lucros",
-        "Outros",
-      ],
-    },
-    {
-      type: "Despesa Fixa",
-      categories: [
-        "Aluguel/Moradia",
-        "Financiamento Imóvel",
-        "Condomínio",
-        "Água",
-        "Energia",
-        "Internet",
-        "Telefone",
-        "Celular",
-        "Assinaturas",
-        "Seguros",
-        "Prestação de Empréstimos",
-        "Plano de Saúde",
-        "Educação",
-        "Impostos",
-        "Entretenimento",
-        "Outros",
-      ],
-    },
-    {
-      type: "Receita Fixa",
-      categories: [
-        "Salário",
-        "Benefícios",
-        "Pensão",
-        "Rendimentos Fixos",
-        "Dividendos",
-        "Aluguéis",
-        "Outros",
-      ],
-    },
-    {
-      type: "Investimentos",
-      categories: [
-        "REITs",
-        "Stocks",
-        "ETFs",
-        "Criptomoedas",
-        "Ações",
-        "FIIs",
-        "Fundos de Investimento",
-        "Tesouro Direto",
-        "CDB",
-        "LCA/LCI",
-        "Debentures",
-        "Commodities",
-        "PGBL/VGBL",
-        "Poupança",
-        "Outros",
-      ],
-    },
-  ],
-};
 
 export default function NewTransaction() {
   const descriptionRef = useRef<HTMLInputElement | null>(null);
