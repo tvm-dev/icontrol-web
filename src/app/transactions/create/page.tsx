@@ -73,7 +73,7 @@ export default function NewTransaction() {
       });
 
       if (response.status === 200) {
-        alert("Transação Criada com Sucesso!");
+        //alert("Transação Criada com Sucesso!");
         window.location.href = "/transactions";
       }
     } catch (error) {
