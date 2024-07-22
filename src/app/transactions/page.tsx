@@ -152,7 +152,7 @@ export default function PageTransactions() {
       <TableTransactions
         transactions={filteredTransactions}
         filterType={filterType}
-        onDelete={handleDelete}
+        //onDelete={handleDelete}
         updateTotals={() => calculateTotals(transactionFiltered)} // Chama calculateTotals quando updateTotals é chamado
       />
     </div>

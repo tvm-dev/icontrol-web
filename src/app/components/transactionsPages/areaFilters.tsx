@@ -37,7 +37,7 @@ const AreaFilter: React.FC<AreaFilterProps> = ({ onFilterChange }) => {
         </select>
       </div>
 
-      <div className="relative">
+      {/* <div className="relative">
         <label htmlFor="reports" className="text-sm font-medium text-gray-700">
           Gerar relatório:
         </label>
@@ -52,7 +52,7 @@ const AreaFilter: React.FC<AreaFilterProps> = ({ onFilterChange }) => {
           <option value="excel">Gerar Excel 💹</option>
           <option value="csv">Gerar CSV 🔡</option>
         </select>
-      </div>
+      </div> */}
     </div>
   );
 };

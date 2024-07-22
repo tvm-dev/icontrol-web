@@ -111,7 +111,7 @@ export default function NewTransaction() {
       <h1 className="font-bold text-2xl text-center text-blue-500 mt-2">
         Nova Transação
       </h1>
-      <div className="w-full mb-2 p-2 rounded">
+      <div className="w-4/5 mx-auto mb-2 p-2 rounded ">
         <form
           className="flex flex-col mx-12 my-2"
           onSubmit={handleRegisterTransaction}
@@ -122,7 +122,7 @@ export default function NewTransaction() {
             ref={descriptionRef}
             type="text"
             required
-            className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-blue-300 border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <div className="flex items-center space-x-2">
@@ -131,10 +131,11 @@ export default function NewTransaction() {
               <label className="text-xs">Valor:</label>
               <input
                 ref={amountRef}
-                defaultValue="1"
+                defaultValue=""
                 type="number"
                 required
-                className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="R$"
+                className="bg-blue-300 border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             {/* Date */}
@@ -144,7 +145,7 @@ export default function NewTransaction() {
                 ref={dateRef}
                 required
                 type="date"
-                className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="bg-blue-300 border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -156,7 +157,7 @@ export default function NewTransaction() {
               <select
                 value={reverseTypeMapping[selectedType] || ""}
                 onChange={handleTypeChange}
-                className="border border-1 mb-2 p-2 rounded w-full"
+                className="bg-blue-300 border border-1 mb-2 p-2 rounded w-full"
               >
                 <option value="">Selecione</option>
                 {Object.keys(typeMapping).map((type) => (
@@ -173,7 +174,7 @@ export default function NewTransaction() {
                 value={selectedCategory}
                 onChange={handleCategoryChange}
                 disabled={!selectedType}
-                className="border border-1 mb-2 p-2 rounded w-full"
+                className="bg-blue-400 border border-1 mb-2 p-2 rounded w-full"
               >
                 <option value="">Selecione</option>
                 {categories.map((category) => (
@@ -191,7 +192,7 @@ export default function NewTransaction() {
               <label className="text-xs">Pago com:</label>
               <select
                 ref={paymentRef}
-                className="border border-1 mb-2 p-2 rounded w-full"
+                className="bg-blue-300 border border-1 mb-2 p-2 rounded w-full"
               >
                 <option value="1">Débito</option>
                 <option value="2">Crédito</option>
@@ -205,7 +206,7 @@ export default function NewTransaction() {
               <label className="text-xs">Status</label>
               <select
                 ref={statusRef}
-                className="border border-1 w-full mbf-2 p-2 rounded"
+                className="bg-blue-300 border border-1 w-full mbf-2 p-2 rounded"
               >
                 <option value="1">Pago</option>
                 <option value="2">Pendente</option>
@@ -218,14 +219,14 @@ export default function NewTransaction() {
           <input
             ref={detailsRef}
             type="text"
-            className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-blue-300 border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           {/* Button */}
           <input
             type="submit"
             value="Salvar Transação"
-            className="cursor-pointer w-full bg-blue-400 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-500"
+            className="cursor-pointer w-full bg-blue-800 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-500"
           />
         </form>
       </div>
