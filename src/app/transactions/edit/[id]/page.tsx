@@ -242,7 +242,7 @@ export default function EditTransactionPage({
   };
 
   const handleDeleteTransaction = async () => {
-    if (confirm("Tem certeza que deseja excluir esta transação?")) {
+    if (confirm("Tem certeza que deseja APAGAR esta transação?")) {
       setIsLoading(true);
 
       try {
@@ -373,7 +373,7 @@ export default function EditTransactionPage({
             className="border border-1 mb-2 p-2 rounded"
           />
 
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col items-center space-y-2">
             <button
               type="submit"
               disabled={isLoading}
@@ -385,11 +385,12 @@ export default function EditTransactionPage({
               type="button"
               onClick={handleDeleteTransaction}
               disabled={isLoading}
-              className="bg-red-500 hover:bg-red-600 text-white p-2 rounded"
+              className="bg-transparent border border-red-500 font-bold hover:bg-red-300 duration-1000 text-black p-2 rounded w-1/2 text-center"
             >
               {isLoading ? "Excluindo..." : "Excluir"}
             </button>
           </div>
+
           <Link
             href="/transactions"
             className="text-blue-500 text-center mt-10 border-b-2"
