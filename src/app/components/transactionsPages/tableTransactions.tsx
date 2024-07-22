@@ -1,3 +1,4 @@
+// src/components/transactionsPages/TableTransactions.tsx
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
@@ -8,11 +9,9 @@ import {
   parseDate,
 } from "@/utils/boniak/dateFilter";
 import { formatCurrencyBRL } from "@/utils/formatCurrencies";
-import { FcEditImage, FcFullTrash } from "react-icons/fc";
 
 type TableTransactionsProps = {
   transactions: Transactions[];
-  onDelete: (id: number) => void;
   updateTotals: (
     ve: number,
     vi: number,
@@ -20,7 +19,7 @@ type TableTransactionsProps = {
     fi: number,
     inv: number
   ) => void;
-  filterType: string | null; // Adicionado
+  filterType: string | null;
 };
 
 const typeMapping: Record<number, string> = {
@@ -33,9 +32,8 @@ const typeMapping: Record<number, string> = {
 
 export default function TableTransactions({
   transactions,
-  onDelete,
   updateTotals,
-  filterType, // Adicionado
+  filterType,
 }: TableTransactionsProps) {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
 
@@ -83,27 +81,23 @@ export default function TableTransactions({
     }
 
     updateTotals(ve, vi, fe, fi, inv);
-  }, [transactions, currentMonth, updateTotals, filterType]); // Adicionado filterType
+  }, [transactions, currentMonth, updateTotals, filterType]);
 
   if (!transactions || transactions.length === 0) {
     return <p className="py-5">Nenhuma transação encontrada!</p>;
   }
 
-  // Array para armazenar os elementos JSX das transações
   const transactionRows: JSX.Element[] = [];
-
-  // Adicionar cabeçalho de mês atual
   let currentHeader = "";
-  transactions.forEach((transaction) => {
-    //const dateKey = formatDateBr(new Date(transaction.date));
+
+  transactions.forEach((transaction, index) => {
     const dateKey = formatDateBr(parseDate(transaction.date));
 
-    // Adicionar cabeçalho de data se mudou
     if (dateKey !== currentHeader) {
       transactionRows.push(
-        <tr key={dateKey} className="bg-gray-100">
+        <tr key={`header-${transaction.id}`} className="bg-gray-100">
           <td
-            colSpan={6}
+            colSpan={4}
             className="text-blue-500 font-semibold p-2 text-sm border-r-2 align-middle"
           >
             📅 {dateKey}
@@ -113,38 +107,25 @@ export default function TableTransactions({
       currentHeader = dateKey;
     }
 
-    // Adicionar linha de transação
     transactionRows.push(
-      <tr
+      <Link
         key={transaction.id}
-        className="group cursor-pointer hover:bg-blue-100"
+        href={`/transactions/edit/${transaction.id}`}
+        passHref
+        legacyBehavior
       >
-        <td>{typeMapping[parseInt(transaction.type)]}</td>
-        <td>{transaction.category}</td>
-        <td>{transaction.description}</td>
-        <td>{formatCurrencyBRL(transaction.amount)}</td>
-        <td className="p-2 hover:bg-red-500">
-          <button
-            className=""
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(transaction.id);
-            }}
-          >
-            <FcFullTrash size={25} />
-          </button>
-        </td>
-        <td className=" hover:bg-red-300 p-2">
-          <Link href={`/transactions/edit/${transaction.id}`}>
-            <FcEditImage title="Editar" size={25} />
-          </Link>
-        </td>
-      </tr>
+        <tr className="group cursor-pointer hover:bg-blue-100">
+          <td className="p-2">{typeMapping[parseInt(transaction.type)]}</td>
+          <td className="p-2">{transaction.category}</td>
+          <td className="p-2">{transaction.description}</td>
+          <td className="p-2">{formatCurrencyBRL(transaction.amount)}</td>
+        </tr>
+      </Link>
     );
   });
 
   return (
-    <div className="flex justify-center overflow-x-hidden">
+    <div className="flex justify-center overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
         <tbody>{transactionRows}</tbody>
       </table>
