@@ -1,5 +1,3 @@
-import { BsFillBadgeSdFill } from "react-icons/bs";
-
 export const data = {
   transactionsType: [
     {

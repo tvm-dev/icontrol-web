@@ -1,10 +1,11 @@
 "use client";
-//-----------------------------------------------------
+
 import { useEffect, useState, ChangeEvent, FormEvent, useRef } from "react";
 import axios from "axios";
 import { api } from "@/app/services/api";
 import { manualToken } from "@/app/services/token";
 import { useRouter } from "next/navigation";
+import DependentDropdown from "@/app/components/DropDownMenu/Menu";
 
 interface EditTransactionProps {
   id: number;
@@ -35,8 +36,8 @@ export default function EditTransaction({
     amount,
     date,
     type,
-    payment,
     category,
+    payment,
     paid,
     details,
   });
@@ -44,9 +45,11 @@ export default function EditTransaction({
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+
   useEffect(() => {
     const fetchData = async () => {
-      //const idNUmber = parseInt(id as any, 10);
       const idNumber = parseInt(id as any, 10);
 
       try {
@@ -55,13 +58,16 @@ export default function EditTransaction({
           headers: { Authorization: `Bearer ${manualToken}` },
         });
 
-        console.log("API Response:", response); // Verifique a resposta completa
-        console.log("Data:", response.data); // Verifique os dados específicos
-
         setFormData({
           ...response.data,
-          paid: !!response.data.paid, // Convertendo para booleano, se necessário
+          paid: !!response.data.paid,
+          type: response.data.type, // Certifique-se de que esses campos existem
+          category: response.data.category,
         });
+
+        // Atualiza os estados selectedType e selectedCategory com base nos dados retornados
+        setSelectedType(response.data.type.toString());
+        setSelectedCategory(response.data.category);
       } catch (error) {
         console.error("Erro ao carregar transação:", error);
         setError("Falha ao carregar a transação solicitada!");
@@ -88,6 +94,7 @@ export default function EditTransaction({
   const typeRef = useRef<HTMLSelectElement | null>(null);
   const paymentRef = useRef<HTMLSelectElement | null>(null);
   const categoryRef = useRef<HTMLSelectElement | null>(null);
+  const statusRef = useRef<HTMLSelectElement | null>(null);
   const detailsRef = useRef<HTMLInputElement | null>(null);
 
   const handleEditTransaction = async (event: FormEvent) => {
@@ -97,9 +104,9 @@ export default function EditTransaction({
 
     const transactionData = {
       description: descriptionRef.current?.value || "",
-      amount: parseFloat(amountRef.current?.value || "0"), // Ensure it's a number
+      amount: parseFloat(amountRef.current?.value || "0"),
       date: dateRef.current?.value || "",
-      type: parseFloat(typeRef.current?.value || "0"), // Ensure it's a number
+      type: parseFloat(typeRef.current?.value || "0"),
       payment: paymentRef.current?.value || "",
       category: categoryRef.current?.value || "",
       details: detailsRef.current?.value || "",
@@ -150,7 +157,6 @@ export default function EditTransaction({
             required
             className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-
           <div className="flex items-center space-x-2">
             <div className="flex flex-col w-full">
               <label className="text-xs">Valor:</label>
@@ -178,31 +184,20 @@ export default function EditTransaction({
             </div>
           </div>
 
+          <DependentDropdown
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+          />
+          {/* Payment and Status */}
           <div className="flex items-center space-x-2">
-            <div className="flex flex-col w-1/2">
-              <label className="text-xs">Tipo:</label>
-              <select
-                ref={typeRef}
-                name="type"
-                value={formData.type}
-                onChange={handleInputChange}
-                className="border border-1 mb-2 p-2 rounded w-full"
-              >
-                <option value="1">Despesa Variável</option>
-                <option value="2">Receita Variável</option>
-                <option value="3">Despesa Fixa</option>
-                <option value="4">Receita Fixa</option>
-                <option value="5">Investimento</option>
-              </select>
-            </div>
             <div className="flex flex-col w-1/2">
               <label className="text-xs">Pago com:</label>
               <select
                 ref={paymentRef}
-                name="payment"
-                value={formData.payment}
-                onChange={handleInputChange}
                 className="border border-1 mb-2 p-2 rounded w-full"
+                defaultValue={formData.payment}
               >
                 <option value="1">Débito</option>
                 <option value="2">Crédito</option>
@@ -211,37 +206,19 @@ export default function EditTransaction({
                 <option value="5">Outros</option>
               </select>
             </div>
-          </div>
 
-          <div className="flex items-center space-x-2">
             <div className="flex flex-col w-1/2">
-              <label className="text-xs">Categoria:</label>
+              <label className="text-xs">Status</label>
               <select
-                ref={categoryRef}
-                name="category"
-                value={formData.category}
-                onChange={handleInputChange}
+                ref={statusRef}
                 className="border border-1 w-full mb-2 p-2 rounded"
+                defaultValue={formData.paid ? "1" : "2"} // Ajuste conforme o valor esperado
               >
-                <option value="1">Habitação</option>
-                <option value="2">Transporte</option>
-                <option value="3">Alimentação</option>
-              </select>
-            </div>
-            <div className="flex flex-col w-1/2">
-              <label className="text-xs">Pago:</label>
-              <select
-                name="paid"
-                value={formData.paid ? "true" : "false"} // Converte booleano para string
-                onChange={handleInputChange}
-                className="border border-1 w-full mb-2 p-2 rounded"
-              >
-                <option value="true">Sim</option>
-                <option value="false">Não</option>
+                <option value="1">Pago</option>
+                <option value="2">Pendente</option>
               </select>
             </div>
           </div>
-
           <label className="text-xs">Detalhes:</label>
           <input
             ref={detailsRef}
@@ -251,7 +228,6 @@ export default function EditTransaction({
             onChange={handleInputChange}
             className="border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-
           {isLoading ? (
             <p className="text-center my-4">Salvando alterações...</p>
           ) : (
@@ -262,9 +238,9 @@ export default function EditTransaction({
             />
           )}
         </form>
-        <p className="mt-10 text-center w-full ">
+        <p className="mt-10 text-center w-full">
           <a
-            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded "
+            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
             href="/transactions"
           >
             Cancelar

@@ -1,13 +1,109 @@
-// src/pages/NewTransaction.tsx
 "use client";
 
 import { api } from "@/app/services/api";
 import { manualToken, userID } from "@/app/services/token";
 import axios from "axios";
 import { FormEvent, useRef, useEffect, useState } from "react";
-import DependentDropdown, {
-  typeMapping,
-} from "@/app/components/DropDownMenu/Menu";
+
+// Mapeamento dos tipos para seus valores numéricos
+const typeMapping: { [key: string]: number } = {
+  "Despesa Variável": 1,
+  "Receita Variável": 2,
+  "Despesa Fixa": 3,
+  "Receita Fixa": 4,
+  Investimentos: 5,
+};
+
+// Mapeamento reverso para converter número em string
+const reverseTypeMapping: { [key: number]: string } = Object.fromEntries(
+  Object.entries(typeMapping).map(([key, value]) => [value, key])
+);
+
+const data = {
+  transactionsType: [
+    {
+      type: "Despesa Variável",
+      categories: [
+        "Restaurante",
+        "Sorveteria",
+        "Lanches",
+        "Educação",
+        "Transporte",
+        "Farmácia",
+        "Reparos em Casa",
+        "Lazer",
+        "Viagens",
+        "Presentes",
+        "Outros",
+      ],
+    },
+    {
+      type: "Receita Variável",
+      categories: [
+        "Freelancer",
+        "Serviços",
+        "Vendas",
+        "Dividendos",
+        "Comissões",
+        "Divisão de Lucros",
+        "Outros",
+      ],
+    },
+    {
+      type: "Despesa Fixa",
+      categories: [
+        "Aluguel/Moradia",
+        "Financiamento Imóvel",
+        "Condomínio",
+        "Água",
+        "Energia",
+        "Internet",
+        "Telefone",
+        "Celular",
+        "Assinaturas",
+        "Seguros",
+        "Prestação de Empréstimos",
+        "Plano de Saúde",
+        "Educação",
+        "Impostos",
+        "Entretenimento",
+        "Outros",
+      ],
+    },
+    {
+      type: "Receita Fixa",
+      categories: [
+        "Salário",
+        "Benefícios",
+        "Pensão",
+        "Rendimentos Fixos",
+        "Dividendos",
+        "Aluguéis",
+        "Outros",
+      ],
+    },
+    {
+      type: "Investimentos",
+      categories: [
+        "REITs",
+        "Stocks",
+        "ETFs",
+        "Criptomoedas",
+        "Ações",
+        "FIIs",
+        "Fundos de Investimento",
+        "Tesouro Direto",
+        "CDB",
+        "LCA/LCI",
+        "Debentures",
+        "Commodities",
+        "PGBL/VGBL",
+        "Poupança",
+        "Outros",
+      ],
+    },
+  ],
+};
 
 export default function NewTransaction() {
   const descriptionRef = useRef<HTMLInputElement | null>(null);
@@ -17,16 +113,29 @@ export default function NewTransaction() {
   const detailsRef = useRef<HTMLInputElement | null>(null);
   const statusRef = useRef<HTMLSelectElement | null>(null);
 
-  const [selectedType, setSelectedType] = useState("Despesa Variável");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedType, setSelectedType] = useState<number>(0);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [categories, setCategories] = useState<string[]>([]);
 
-  // const typeMapping: { [key: string]: number } = {
-  //   "Despesa Variável": 1,
-  //   "Receita Variável": 2,
-  //   "Despesa Fixa": 3,
-  //   "Receita Fixa": 4,
-  //   Investimento: 5,
-  // };
+  const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const typeString = event.target.value;
+    const typeNumber = typeMapping[typeString as keyof typeof typeMapping];
+    setSelectedType(typeNumber);
+
+    const typeData = data.transactionsType.find((t) => t.type === typeString);
+    if (typeData) {
+      setCategories(typeData.categories);
+    } else {
+      setCategories([]);
+    }
+    setSelectedCategory("");
+  };
+
+  const handleCategoryChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setSelectedCategory(event.target.value);
+  };
 
   async function handleRegisterTransaction(event: FormEvent) {
     event.preventDefault();
@@ -38,7 +147,7 @@ export default function NewTransaction() {
       payment: paymentRef.current?.value || "",
       details: detailsRef.current?.value || "",
       paid: statusRef.current?.value === "1",
-      type: typeMapping[selectedType] || 0,
+      type: selectedType,
       category: selectedCategory,
     };
 
@@ -125,13 +234,41 @@ export default function NewTransaction() {
             </div>
           </div>
 
-          {/* Dependent Dropdown */}
-          <DependentDropdown
-            selectedType={selectedType}
-            setSelectedType={setSelectedType}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-          />
+          {/* Tipo e Categoria */}
+          <div className="flex items-center space-x-2">
+            <div className="flex flex-col w-1/2">
+              <label className="text-xs">Tipo:</label>
+              <select
+                value={reverseTypeMapping[selectedType] || ""}
+                onChange={handleTypeChange}
+                className="border border-1 mb-2 p-2 rounded w-full"
+              >
+                <option value="">Selecione</option>
+                {Object.keys(typeMapping).map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col w-1/2">
+              <label className="text-xs">Categoria:</label>
+              <select
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                disabled={!selectedType}
+                className="border border-1 mb-2 p-2 rounded w-full"
+              >
+                <option value="">Selecione</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
           {/* Payment and Status */}
           <div className="flex items-center space-x-2">
@@ -153,7 +290,7 @@ export default function NewTransaction() {
               <label className="text-xs">Status</label>
               <select
                 ref={statusRef}
-                className="border border-1 w-full mb-2 p-2 rounded"
+                className="border border-1 w-full mbf-2 p-2 rounded"
               >
                 <option value="1">Pago</option>
                 <option value="2">Pendente</option>

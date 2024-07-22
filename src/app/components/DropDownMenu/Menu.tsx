@@ -12,9 +12,14 @@ export const typeMapping: { [key: string]: number } = {
   Investimentos: 5,
 };
 
+// Mapeamento reverso para converter número em string
+const reverseTypeMapping: { [key: number]: string } = Object.fromEntries(
+  Object.entries(typeMapping).map(([key, value]) => [value, key])
+);
+
 interface DependentDropdownProps {
-  selectedType: string;
-  setSelectedType: (type: string) => void;
+  selectedType: number; // Atualizado para número
+  setSelectedType: (type: number) => void; // Atualizado para número
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
 }
@@ -28,13 +33,30 @@ const DependentDropdown = ({
   const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
-    const typeData = data.transactionsType.find((t) => t.type === selectedType);
-    setCategories(typeData ? typeData.categories : []);
-    setSelectedCategory(""); // Limpa a categoria selecionada
+    // Atualiza as categorias com base no tipo selecionado
+    const typeString = reverseTypeMapping[selectedType];
+    const typeData = data.transactionsType.find((t) => t.type === typeString);
+    if (typeData) {
+      setCategories(typeData.categories);
+    } else {
+      setCategories([]);
+    }
+    // Limpa a categoria selecionada ao alterar o tipo
+    setSelectedCategory("");
   }, [selectedType, setSelectedCategory]);
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedType(event.target.value);
+    const typeString = event.target.value;
+    const typeNumber = typeMapping[typeString as keyof typeof typeMapping];
+    setSelectedType(typeNumber);
+
+    // Atualiza categorias ao selecionar um novo tipo
+    const typeData = data.transactionsType.find((t) => t.type === typeString);
+    if (typeData) {
+      setCategories(typeData.categories);
+    } else {
+      setCategories([]);
+    }
   };
 
   const handleCategoryChange = (
@@ -45,23 +67,24 @@ const DependentDropdown = ({
 
   return (
     <div className="flex items-center space-x-2">
-      {/* Type */}
+      {/* Tipo */}
       <div className="flex flex-col w-1/2">
         <label className="text-xs">Tipo:</label>
         <select
-          value={selectedType}
+          value={reverseTypeMapping[selectedType] || ""}
           onChange={handleTypeChange}
           className="border border-1 mb-2 p-2 rounded w-full"
         >
-          {data.transactionsType.map((type) => (
-            <option key={type.type} value={type.type}>
-              {type.type}
+          <option value="">Selecione</option>
+          {Object.keys(typeMapping).map((type) => (
+            <option key={type} value={type}>
+              {type}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Category */}
+      {/* Categoria */}
       <div className="flex flex-col w-1/2">
         <label className="text-xs">Categoria:</label>
         <select
