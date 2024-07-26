@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export default function Header({ onToggleSidebar }: HeaderProps) {
   return (
-    <nav className="bg-blue-500 p-4 fixed w-full z-40">
+    <nav className="bg-blue-500 p-4 fixed w-full z-40 mb-10">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-white text-lg font-bold flex items-center">
           <Image
@@ -18,7 +18,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
             height={40}
             className="mr-2" // Margem direita para espaçar o texto
           />
-          <a href="/">iControl</a>
+          <a href="/dashboard">iControl</a>
         </div>
 
         {/* Hamburger Menu Button */}

@@ -1,4 +1,6 @@
 // src/components/transactionsPages/TableTransactions.tsx
+//-----------
+
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
@@ -126,9 +128,11 @@ export default function TableTransactions({
 
   return (
     <div className="flex justify-center overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <tbody>{transactionRows}</tbody>
-      </table>
+      <div className="w-full max-w-4xl">
+        <table className="w-full divide-y divide-gray-200">
+          <tbody>{transactionRows}</tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -108,12 +108,12 @@ export default function NewTransaction() {
 
   return (
     <>
-      <h1 className="font-bold text-2xl text-center text-blue-500 mt-2">
+      <h1 className="font-bold text-2xl text-center text-blue-500 pt-20">
         Nova Transação
       </h1>
-      <div className=" mb-2 p-2 rounded">
+      <div className="mb-2 p-2 rounded flex justify-center">
         <form
-          className="flex flex-col mx-12 my-2"
+          className="flex flex-col w-full max-w-lg mx-4 my-2"
           onSubmit={handleRegisterTransaction}
         >
           {/* Description */}
@@ -206,7 +206,7 @@ export default function NewTransaction() {
               <label className="text-xs">Status</label>
               <select
                 ref={statusRef}
-                className="bg-blue-300 border border-1 w-full mbf-2 p-2 rounded"
+                className="bg-blue-300 border border-1 w-full mb-2 p-2 rounded"
               >
                 <option value="1">Pago</option>
                 <option value="2">Pendente</option>

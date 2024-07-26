@@ -10,6 +10,7 @@ import { useState } from "react";
 import Header from "@/app/components/Shared/Header";
 import Sidebar from "./components/Shared/Sidebar";
 import Footer from "./components/Shared/Footer";
+import FloatingButton from "./components/Shared/FloatingButton";
 
 const mainFontFamily = Roboto({
   weight: ["300", "400", "700"],
@@ -38,7 +39,9 @@ export default function RootLayout({
         <Header onToggleSidebar={toggleSidebar} />
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <main>{children}</main>
-        <Footer />
+        <FloatingButton />
+
+        {/* <Footer /> */}
       </body>
     </html>
   );

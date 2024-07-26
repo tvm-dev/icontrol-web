@@ -6,7 +6,7 @@ import { api } from "@/app/services/api";
 import { manualToken } from "@/app/services/token";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
+import { data } from "@/app/components/DropDownMenu/data";
 interface EditTransactionProps {
   id: number;
   description: string;
@@ -30,31 +30,6 @@ const typeMapping: { [key: string]: number } = {
 const reverseTypeMapping: { [key: number]: string } = Object.fromEntries(
   Object.entries(typeMapping).map(([key, value]) => [value, key])
 );
-
-const data = {
-  transactionsType: [
-    {
-      type: "Despesa Variável",
-      categories: ["Alimentação", "Transporte", "Lazer"],
-    },
-    {
-      type: "Receita Variável",
-      categories: ["Freelance", "Vendas"],
-    },
-    {
-      type: "Despesa Fixa",
-      categories: ["Aluguel", "Internet", "Energia"],
-    },
-    {
-      type: "Receita Fixa",
-      categories: ["Salário"],
-    },
-    {
-      type: "Investimentos",
-      categories: ["Ações", "Fundos Imobiliários"],
-    },
-  ],
-};
 
 const DependentDropdown = ({
   selectedType,
@@ -275,12 +250,12 @@ export default function EditTransactionPage({
 
   return (
     <>
-      <h1 className="font-bold text-2xl text-center text-blue-500 mt-2">
+      <h1 className="font-bold text-2xl text-center text-blue-500 pt-20">
         Alterando Transação...
       </h1>
-      <div className="w-full mb-2 p-2 rounded">
+      <div className="mb-2 p-2 rounded flex justify-center">
         <form
-          className="flex flex-col mx-12 my-2"
+          className="flex flex-col w-full max-w-lg mx-4 my-2"
           onSubmit={handleEditTransaction}
         >
           <label className="text-xs">Descrição:</label>
@@ -385,9 +360,9 @@ export default function EditTransactionPage({
               type="button"
               onClick={handleDeleteTransaction}
               disabled={isLoading}
-              className="bg-transparent border border-red-500 font-bold hover:bg-red-300 duration-1000 text-black p-2 rounded w-1/2 text-center"
+              className="bg-transparent text-black border border-red-500 font-bold hover:bg-red-600 duration-1000 hover:text-white p-2 rounded w-1/2 text-center"
             >
-              {isLoading ? "Excluindo..." : "Excluir"}
+              {isLoading ? "Excluindo..." : "Apagar Transação"}
             </button>
           </div>
 
