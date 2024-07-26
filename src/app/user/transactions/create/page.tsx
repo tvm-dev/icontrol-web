@@ -5,6 +5,7 @@ import { manualToken, userID } from "@/app/services/token";
 import axios from "axios";
 import { FormEvent, useRef, useEffect, useState } from "react";
 import { data } from "@/app/components/DropDownMenu/data";
+import Link from "next/link";
 
 // Mapeamento dos tipos para seus valores numéricos
 const typeMapping: { [key: string]: number } = {
@@ -228,6 +229,12 @@ export default function NewTransaction() {
             value="Salvar Transação"
             className="cursor-pointer w-full bg-blue-800 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-500"
           />
+          <Link
+            href="/transactions"
+            className="text-blue-500 text-center mt-10 border-b-2"
+          >
+            Voltar para todas as transações
+          </Link>
         </form>
       </div>
     </>

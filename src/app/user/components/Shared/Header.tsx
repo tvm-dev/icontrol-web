@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export default function Header({ onToggleSidebar }: HeaderProps) {
   return (
-    <nav className="bg-blue-500 p-4 fixed w-full z-40 mb-10">
+    <nav className="bg-blue-500 p-4 fixed w-full z-40">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-white text-lg font-bold flex items-center">
           <Image

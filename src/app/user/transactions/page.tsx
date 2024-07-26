@@ -1,18 +1,16 @@
 "use client";
-//============================================================================
 import { useEffect, useState } from "react";
 import AreaMonth from "../components/transactionsPages/areaMonths";
 import { AreaBalanceMonth } from "../components/transactionsPages/areaBalanceMonths";
 import AreaFilter from "../components/transactionsPages/areaFilters";
-import ParentComponent from "../components/ParentComponent";
 import TableTransactions from "../components/transactionsPages/tableTransactions";
 import {
   getCurrentMonth,
   filterTransactionsByMonth,
   Transactions,
-} from "@/utils/boniak/dateFilter";
-import { api } from "@/app/services/api";
-import { manualToken, userID } from "@/app/services/token";
+} from "@/app/utils/boniak/dateFilter";
+import { api } from "../services/api";
+import { manualToken } from "../services/token";
 
 export default function PageTransactions() {
   const [currentMonth, setCurrentMonth] = useState<string>(getCurrentMonth());
@@ -25,10 +23,8 @@ export default function PageTransactions() {
   const [fixedExpenses, setFixedExpenses] = useState<number>(0);
   const [fixedIncomes, setFixedIncomes] = useState<number>(0);
   const [investments, setInvestments] = useState<number>(0);
-  // Estado para armazenar o tipo de filtro selecionado
   const [filterType, setFilterType] = useState<string | null>(null);
 
-  // Define a função calculateTotals
   const calculateTotals = (filteredTransactions: Transactions[]) => {
     let ve = 0,
       vi = 0,
@@ -38,19 +34,19 @@ export default function PageTransactions() {
 
     filteredTransactions.forEach((transaction) => {
       switch (parseInt(transaction.type)) {
-        case 1: // Despesa variável
+        case 1:
           ve += transaction.amount;
           break;
-        case 2: // Receita variável
+        case 2:
           vi += transaction.amount;
           break;
-        case 3: // Despesa fixa
+        case 3:
           fe += transaction.amount;
           break;
-        case 4: //Receita fixa
+        case 4:
           fi += transaction.amount;
           break;
-        case 5: // Investimento
+        case 5:
           inv += transaction.amount;
           break;
         default:
@@ -69,16 +65,13 @@ export default function PageTransactions() {
     const loadAllTransactions = async () => {
       try {
         const response = await api.get("/transactions", {
-          // params: { userID: userID },
           headers: { Authorization: `Bearer ${manualToken}` },
         });
-        console.log("API response tvm ok:", response.data);
         setTransactions(response.data);
       } catch (error) {
-        console.error("Erro ao carregar transações tvm problema:", error);
+        console.error("Erro ao carregar transações:", error);
       }
     };
-
     loadAllTransactions();
   }, []);
 
@@ -92,17 +85,14 @@ export default function PageTransactions() {
 
   useEffect(() => {
     if (transactionFiltered.length > 0) {
-      calculateTotals(transactionFiltered); // Chama calculateTotals quando transactionFiltered é atualizado
+      calculateTotals(transactionFiltered);
     }
   }, [transactionFiltered]);
 
-  //--------delete----------------
   const handleDelete = async (id: number) => {
-    //alert(typeof id);
     const isConfirmed = window.confirm(
-      `Você realmente quer apagar esta transação? Não será mais possível recuperá-la!`
+      "Você realmente quer apagar esta transação? Não será mais possível recuperá-la!"
     );
-
     if (!isConfirmed) return;
 
     try {
@@ -110,21 +100,18 @@ export default function PageTransactions() {
         params: { id: id },
         headers: { Authorization: `Bearer ${manualToken}` },
       });
-
-      const updatedTransactions = transactions.filter(
-        (transaction) => transaction.id !== id
+      setTransactions(
+        transactions.filter((transaction) => transaction.id !== id)
       );
-      setTransactions(updatedTransactions);
     } catch (error) {
       console.error("Erro ao deletar transação:", error);
     }
   };
-  //change month-------------------------------------------
+
   const handleMonthChange = (newMonth: string) => {
     setCurrentMonth(newMonth);
   };
 
-  //filter by transactions type:-------------------------------
   const handleFilterChange = (type: string | null) => {
     setFilterType(type);
   };
@@ -136,7 +123,7 @@ export default function PageTransactions() {
     : transactionFiltered;
 
   return (
-    <div className="text-center">
+    <div className="p-4 md:p-6 lg:p-8 space-y-4">
       <AreaMonth
         currentMonth={currentMonth}
         onMonthChange={handleMonthChange}
@@ -152,8 +139,7 @@ export default function PageTransactions() {
       <TableTransactions
         transactions={filteredTransactions}
         filterType={filterType}
-        //onDelete={handleDelete}
-        updateTotals={() => calculateTotals(transactionFiltered)} // Chama calculateTotals quando updateTotals é chamado
+        updateTotals={() => calculateTotals(transactionFiltered)}
       />
     </div>
   );

@@ -3,8 +3,8 @@ import { manualToken } from "../services/token";
 import { api } from "../services/api";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { formatCurrencyBRL } from "@/utils/formatCurrencies";
-import Greeting from "@/utils/greetings";
+import { formatCurrencyBRL } from "../../utils/formatCurrencies";
+import Greeting from "../../utils/greetings";
 
 export default function Dashboard() {
   const [fiSum, setFiSum] = useState<number | null>(null);

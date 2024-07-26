@@ -75,7 +75,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <ul>
               <li className="mt-2">
                 <a
-                  href="/dashboard"
+                  href="/user/dashboard"
                   className="flex items-center space-x-4 p-2 hover:bg-gray-600 transition-colors duration-300 rounded"
                 >
                   <HomeIcon className="h-6 w-6 text-gray-300" />
@@ -84,7 +84,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </li>
               <li className="mt-2">
                 <a
-                  href="/transactions"
+                  href="/user/transactions"
                   className="flex items-center space-x-4 p-2 hover:bg-gray-600 transition-colors duration-300 rounded"
                 >
                   <CurrencyDollarIcon className="h-6 w-6 text-gray-300" />
@@ -93,7 +93,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </li>
               <li className="mt-2">
                 <a
-                  href="/reports"
+                  href="/user/investments"
                   className="flex items-center space-x-4 p-2 hover:bg-gray-600 transition-colors duration-300 rounded"
                 >
                   <BanknotesIcon className="h-6 w-6 text-gray-300" />
@@ -102,7 +102,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </li>
               <li className="mt-2">
                 <a
-                  href="/reports"
+                  href="/user/reports"
                   className="flex items-center space-x-4 p-2 hover:bg-gray-600 transition-colors duration-300 rounded"
                 >
                   <DocumentTextIcon className="h-6 w-6 text-gray-300" />

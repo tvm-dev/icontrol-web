@@ -9,8 +9,10 @@ import {
   filterTransactionsByMonth,
   formatDateBr,
   parseDate,
-} from "@/utils/boniak/dateFilter";
-import { formatCurrencyBRL } from "@/utils/formatCurrencies";
+} from "@/app/utils/boniak/dateFilter";
+
+import { formatCurrentMonth } from "@/app/utils/boniak/dateFilter";
+import { formatCurrencyBRL } from "@/app/utils/formatCurrencies";
 
 type TableTransactionsProps = {
   transactions: Transactions[];
