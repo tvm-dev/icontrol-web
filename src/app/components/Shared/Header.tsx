@@ -1,24 +1,30 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
-export default function Header() {
-  const [isOpen, setIsOpen] = useState(false);
+interface HeaderProps {
+  onToggleSidebar: () => void;
+}
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
-
+export default function Header({ onToggleSidebar }: HeaderProps) {
   return (
     <nav className="bg-blue-500 p-4 fixed w-full z-40">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="text-white text-lg font-bold">
+        <div className="text-white text-lg font-bold flex items-center">
+          <Image
+            src="/images/logo.png" // Caminho relativo ao diretório `public`
+            alt="iControl Logo"
+            width={40}
+            height={40}
+            className="mr-2" // Margem direita para espaçar o texto
+          />
           <a href="/">iControl</a>
         </div>
 
         {/* Hamburger Menu Button */}
         <button
           className="text-white flex items-center md:hidden"
-          onClick={toggleMenu}
+          onClick={onToggleSidebar}
         >
           <svg
             className="w-6 h-6"
@@ -35,42 +41,6 @@ export default function Header() {
             />
           </svg>
         </button>
-      </div>
-
-      {/* Mobile Menu */}
-      <div
-        className={`${
-          isOpen ? "block" : "hidden"
-        } md:hidden absolute top-16 left-0 w-full bg-blue-500 z-40`}
-      >
-        <ul className="flex flex-col space-y-2 p-4">
-          <li>
-            <a
-              href="/dashboard"
-              className="text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
-            >
-              Início
-            </a>
-          </li>
-
-          <li>
-            <a
-              href="/transactions"
-              className="text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
-            >
-              Transações
-            </a>
-          </li>
-
-          <li>
-            <a
-              href="/transactions/create"
-              className="text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
-            >
-              Criar Transação
-            </a>
-          </li>
-        </ul>
       </div>
     </nav>
   );

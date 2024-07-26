@@ -1,9 +1,11 @@
+//---
+"use client";
+//---
+
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
-
-// Adicione o link ao protótipo no Navbar ou Footer se necessário.
+import { useState } from "react";
 
 import Header from "@/app/components/Shared/Header";
 import Sidebar from "./components/Shared/Sidebar";
@@ -14,22 +16,29 @@ const mainFontFamily = Roboto({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "iControl: pq vc controla SUA GRANA!",
-  description: "tvm alterar description here",
-};
+// export const metadata: Metadata = {
+//   title: "iControl: pq vc controla SUA GRANA!",
+//   description: "tvm alterar description here",
+// };
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
     <html lang="en" className={mainFontFamily.className}>
       <body>
-        <Header />
-        <Sidebar />
-        {children}
+        <Header onToggleSidebar={toggleSidebar} />
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   );
