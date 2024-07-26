@@ -111,7 +111,7 @@ export default function NewTransaction() {
       <h1 className="font-bold text-2xl text-center text-blue-500 mt-2">
         Nova Transação
       </h1>
-      <div className="w-4/5 mx-auto mb-2 p-2 rounded ">
+      <div className=" mb-2 p-2 rounded">
         <form
           className="flex flex-col mx-12 my-2"
           onSubmit={handleRegisterTransaction}

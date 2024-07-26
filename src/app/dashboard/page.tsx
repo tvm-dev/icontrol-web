@@ -6,227 +6,194 @@ import Link from "next/link";
 import { formatCurrencyBRL } from "@/utils/formatCurrencies";
 import Greeting from "@/utils/greetings";
 
-interface CurrencyComponentProps {
-  amount: number;
-}
-
-export default function Dashboad() {
-  //=======================Loading Balances:
-  //FI: fixed income:
+export default function Dashboard() {
   const [fiSum, setFiSum] = useState<number | null>(null);
-
-  //VI: variable income:
   const [viSum, setViSum] = useState<number | null>(null);
-
-  //FE: fixed expenses:
   const [feSum, setFeSum] = useState<number | null>(null);
-
-  // VE = variable expense:
   const [veSum, setVeSum] = useState<number | null>(null);
-
-  //in: Investments:
   const [inSum, setInSum] = useState<number | null>(null);
 
   useEffect(() => {
-    LoadFixedIncome(),
-      LoadVariableIncome(),
-      LoadFixedExpense(),
-      LoadVariableExpense(),
-      LoadInvestments();
+    loadBalances();
   }, []);
 
-  //starting fixe income:=============================
-  async function LoadFixedIncome() {
+  const loadBalances = async () => {
+    await Promise.all([
+      loadFixedIncome(),
+      loadVariableIncome(),
+      loadFixedExpense(),
+      loadVariableExpense(),
+      loadInvestments(),
+    ]);
+  };
+
+  const loadFixedIncome = async () => {
     try {
       const response = await api.get("/balance/fi", {
         headers: { Authorization: `Bearer ${manualToken}` },
       });
       setFiSum(response.data);
     } catch (error) {
-      console.log("Error tvm: ", error);
+      console.log("Error loading fixed income: ", error);
     }
-  }
-  //starting variable income:=============================
-  async function LoadVariableIncome() {
+  };
+
+  const loadVariableIncome = async () => {
     try {
       const response = await api.get("/balance/vi", {
         headers: { Authorization: `Bearer ${manualToken}` },
       });
       setViSum(response.data);
     } catch (error) {
-      console.log("Error tvm: ", error);
+      console.log("Error loading variable income: ", error);
     }
-  }
+  };
 
-  //starting fixed expense:=============================
-  async function LoadFixedExpense() {
+  const loadFixedExpense = async () => {
     try {
       const response = await api.get("/balance/fe", {
         headers: { Authorization: `Bearer ${manualToken}` },
       });
       setFeSum(response.data);
     } catch (error) {
-      console.log("Error tvm: ", error);
+      console.log("Error loading fixed expense: ", error);
     }
-  }
+  };
 
-  //starting variable expense:=============================
-  async function LoadVariableExpense() {
+  const loadVariableExpense = async () => {
     try {
       const response = await api.get("/balance/ve", {
         headers: { Authorization: `Bearer ${manualToken}` },
       });
       setVeSum(response.data);
     } catch (error) {
-      console.log("Error tvm: ", error);
+      console.log("Error loading variable expense: ", error);
     }
-  }
+  };
 
-  //starting investiments:=============================
-  async function LoadInvestments() {
+  const loadInvestments = async () => {
     try {
       const response = await api.get("/balance/in", {
         headers: { Authorization: `Bearer ${manualToken}` },
       });
       setInSum(response.data);
     } catch (error) {
-      console.log("Error tvm: ", error);
+      console.log("Error loading investments: ", error);
     }
-  }
+  };
 
   return (
-    <>
-      <div className="m-5">
-        <div className="flex flex-row justify-between my-2 ">
-          <h2 className="font-bold mt-2 ">Dashboad</h2>
-          <a href="/transactions/create">
-            <h2 className="font-bold mt-2 cursor-pointer bg-red-300 p-2 m-2 rounded hover:bg-red-500 transition duration-300  ">
-              + Nova Transação
-            </h2>
-          </a>
-        </div>
-
-        {/* User Name */}
-        <div className="text-center bg-blue-50 p-2 rounded">
-          <h2 className="text-center">
-            {/* Olá <span className="font-bold">Thiago</span>, Bom dia ☀️ */}
-            <Greeting />
-          </h2>
-        </div>
-        {/* Months */}
-
-        {/* Balance */}
-        <p className="font-semibold">Saldos</p>
-
-        <div className="grid grid-cols-2 drop-shadow-2xl text-white text-center py-4 rounded bg-blue-400">
-          <div className="border-r-2">
-            <h1 className="font-bold text-2xl">
-              {formatCurrencyBRL((fiSum ?? 0) + (viSum ?? 0))}
-            </h1>
-            <p className="text-sm">Atual</p>
-          </div>
-          <div>
-            <div>
-              <h1 className="font-bold text-3xl">
-                <span className="font-thin text-sm">R$</span> ?
-              </h1>
-              <p className="text-sm">Previsto</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Revenues ============================== */}
-        <p className="font-semibold">Receitas</p>
-
-        <Link href={"/revenues"}>
-          <div
-            className="grid grid-cols-2 drop-shadow-2xl text-black  text-center p-2 rounded bg-green-400         
-          hover:bg-green-500 transition duration-500"
-          >
-            <div className="border-r-2">
-              <h1 className="font-bold text-3xl">
-                {formatCurrencyBRL((fiSum ?? 0) + (viSum ?? 0))}
-              </h1>
-              <p className="text-sm">Atual</p>
-
-              <p>
-                <span className="font-thin text-sm">R$</span> ?
-              </p>
-              <p>Prevista</p>
-            </div>
-            <div>
-              <div>
-                <h1 className="font-bold"> {formatCurrencyBRL(fiSum ?? 0)} </h1>
-                <p className="">Fixas</p>
-              </div>
-
-              <div>
-                <h1 className="font-bold"> {formatCurrencyBRL(viSum ?? 0)} </h1>
-                <p className="">Variáveis</p>
-              </div>
-            </div>
-          </div>
-        </Link>
-
-        {/* Expenses ============================== */}
-        <p className="font-semibold">Despesas</p>
-
-        <Link href={"/expenses"}>
-          <div
-            className="grid grid-cols-2 drop-shadow-2xl text-white text-center p-2 rounded bg-red-400         
-          hover:bg-red-500 transition duration-500"
-          >
-            <div className="border-r-2">
-              <h1 className="font-bold text-3xl">
-                - {formatCurrencyBRL((feSum ?? 0) + (veSum ?? 0))}
-              </h1>
-              <p className="text-sm">Atual</p>
-              <p> - R$ ?</p>
-              <p>Prevista</p>
-            </div>
-            <div>
-              <div>
-                <h1 className="font-bold">
-                  {" "}
-                  - {formatCurrencyBRL(feSum ?? 0)}
-                </h1>
-                <p className="">Fixas</p>
-              </div>
-              <span className="underline"> </span>
-              <div>
-                <h1 className="font-bold">
-                  {" "}
-                  - {formatCurrencyBRL(veSum ?? 0)}{" "}
-                </h1>
-                <p className="">Variáveis</p>
-              </div>
-            </div>
-          </div>
-        </Link>
-
-        {/* Investiments ==============================*/}
-        <p className="font-semibold">Investimentos</p>
-
-        <Link href={"/investments"}>
-          <div className="grid grid-cols-2 drop-shadow-2xl text-white text-center py-5 rounded bg-sky-800 hover:bg-yellow-500 transition duration-500">
-            <div className="border-r-2">
-              <h1 className="font-bold text-2xl">
-                <span className="font-thin text-sm"> - </span>{" "}
-                {formatCurrencyBRL(inSum ?? 0)}
-              </h1>
-              <p className="text-sm">Este mês</p>
-            </div>
-            <div>
-              <div>
-                <h1 className="font-bold">?</h1>
-                <p className="">Total</p>
-              </div>
-            </div>
-          </div>
-        </Link>
-
-        {/* Graficos */}
+    <div className="md:ml-64 p-4 pt-20">
+      <div className="flex flex-row justify-between my-2">
+        <h2 className="font-bold mt-2">Dashboard</h2>
       </div>
-    </>
+
+      <div className="text-center bg-blue-50 p-2 rounded mb-4">
+        <h2>
+          <Greeting />
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Balance */}
+        <div className="bg-blue-400 text-white text-center p-2 rounded-lg shadow-lg">
+          <p className="font-semibold">Saldos</p>
+          <div className="flex flex-col">
+            <div className="flex flex-1 justify-between items-center">
+              <div className="flex flex-col items-center flex-1">
+                <h1 className="font-bold text-xl">
+                  {formatCurrencyBRL((fiSum ?? 0) + (viSum ?? 0))}
+                </h1>
+                <p className="text-sm">Atual</p>
+              </div>
+              <div className="flex flex-col items-center flex-1">
+                <h1 className="font-bold text-2xl">
+                  <span className="font-thin text-sm">R$</span> ?
+                </h1>
+                <p className="text-sm">Previsto</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Revenues */}
+        <Link href="/revenues">
+          <div className="bg-green-400 text-black text-center p-4 rounded-lg shadow-lg hover:bg-green-500 transition duration-500">
+            <p className="font-semibold mb-2">Receitas</p>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-1 justify-between items-center">
+                <div className="flex flex-col items-center flex-1">
+                  <h1 className="font-bold text-xl">
+                    {formatCurrencyBRL((fiSum ?? 0) + (viSum ?? 0))}
+                  </h1>
+                  <p className="text-sm">Atual</p>
+                  <p>
+                    <span className="font-thin text-sm">R$</span> ?
+                  </p>
+                  <p>Prevista</p>
+                </div>
+                <div className="flex flex-col items-center flex-1">
+                  <h1 className="font-bold">{formatCurrencyBRL(fiSum ?? 0)}</h1>
+                  <p>Fixas</p>
+                  <h1 className="font-bold">{formatCurrencyBRL(viSum ?? 0)}</h1>
+                  <p>Variáveis</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Expenses */}
+        <Link href="/expenses">
+          <div className="bg-red-400 text-white text-center p-4 rounded-lg shadow-lg hover:bg-red-500 transition duration-500">
+            <p className="font-semibold mb-2">Despesas</p>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-1 justify-between items-center">
+                <div className="flex flex-col items-center flex-1">
+                  <h1 className="font-bold text-xl">
+                    - {formatCurrencyBRL((feSum ?? 0) + (veSum ?? 0))}
+                  </h1>
+                  <p className="text-sm">Atual</p>
+                  <p> - R$ ?</p>
+                  <p>Prevista</p>
+                </div>
+                <div className="flex flex-col items-center flex-1">
+                  <h1 className="font-bold">
+                    - {formatCurrencyBRL(feSum ?? 0)}
+                  </h1>
+                  <p>Fixas</p>
+                  <h1 className="font-bold">
+                    - {formatCurrencyBRL(veSum ?? 0)}
+                  </h1>
+                  <p>Variáveis</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Investments */}
+        <Link href="/investments">
+          <div className="bg-sky-800 text-white text-center p-4 rounded-lg shadow-lg hover:bg-yellow-500 transition duration-500">
+            <p className="font-semibold mb-2">Investimentos</p>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-1 justify-between items-center">
+                <div className="flex flex-col items-center flex-1">
+                  <h1 className="font-bold text-xl">
+                    <span className="font-thin text-sm"> - </span>
+                    {formatCurrencyBRL(inSum ?? 0)}
+                  </h1>
+                  <p className="text-sm">Este mês</p>
+                </div>
+                <div className="flex flex-col items-center flex-1">
+                  <h1 className="font-bold">?</h1>
+                  <p>Total</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </div>
+    </div>
   );
 }

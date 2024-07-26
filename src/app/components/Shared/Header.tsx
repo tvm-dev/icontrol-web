@@ -1,5 +1,4 @@
-"use client"; // Se estiver usando Next.js, isso garante que o componente seja executado no cliente
-
+"use client";
 import { useState } from "react";
 
 export default function Header() {
@@ -10,15 +9,15 @@ export default function Header() {
   };
 
   return (
-    <nav className="bg-blue-500 p-4">
+    <nav className="bg-blue-500 p-4 fixed w-full z-40">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-white text-lg font-bold">
           <a href="/">iControl</a>
         </div>
 
-        {/* Botão do Menu Hamburguer */}
+        {/* Hamburger Menu Button */}
         <button
-          className="text-white md:hidden flex items-center"
+          className="text-white flex items-center md:hidden"
           onClick={toggleMenu}
         >
           <svg
@@ -36,58 +35,28 @@ export default function Header() {
             />
           </svg>
         </button>
-
-        {/* Menu Desktop */}
-        <ul className="hidden md:flex space-x-4">
-          <li>
-            <a
-              href="/dashboard"
-              className="bg-green-500 text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
-            >
-              Dash
-            </a>
-          </li>
-
-          <li>
-            <a
-              href="/transactions"
-              className="bg-green-500 text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
-            >
-              Transações
-            </a>
-          </li>
-
-          <li>
-            <a
-              href="/transactions/create"
-              className="bg-green-500 text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
-            >
-              Criar Transação
-            </a>
-          </li>
-        </ul>
       </div>
 
-      {/* Menu Mobile */}
+      {/* Mobile Menu */}
       <div
-        className={`md:hidden ${
+        className={`${
           isOpen ? "block" : "hidden"
-        } absolute top-16 left-0 w-full bg-blue-500`}
+        } md:hidden absolute top-16 left-0 w-full bg-blue-500 z-40`}
       >
         <ul className="flex flex-col space-y-2 p-4">
           <li>
             <a
               href="/dashboard"
-              className="bg-green-500 text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
+              className="text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
             >
-              Dash
+              Início
             </a>
           </li>
 
           <li>
             <a
               href="/transactions"
-              className="bg-green-500 text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
+              className="text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
             >
               Transações
             </a>
@@ -96,7 +65,7 @@ export default function Header() {
           <li>
             <a
               href="/transactions/create"
-              className="bg-green-500 text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
+              className="text-white hover:text-gray-200 hover:bg-green-900 p-2 transition duration-500 rounded"
             >
               Criar Transação
             </a>

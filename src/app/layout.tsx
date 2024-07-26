@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
+
+// Adicione o link ao protótipo no Navbar ou Footer se necessário.
 
 import Header from "@/app/components/Shared/Header";
-import Footer from "@/app/components/Shared/Footer";
 import Sidebar from "./components/Shared/Sidebar";
+import Footer from "./components/Shared/Footer";
 
 const mainFontFamily = Roboto({
   weight: ["300", "400", "700"],
@@ -23,16 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={mainFontFamily.className}>
-      <body className="flex min-h-screen">
-        <Sidebar /> {/* Inclua o componente Sidebar */}
-        <div className="flex flex-col flex-grow ml-64">
-          {" "}
-          {/* Ajuste a margem para acomodar a Sidebar */}
-          <Header />
-          <main className="flex-grow">{children}</main>{" "}
-          {/* Envolva o conteúdo principal */}
-          <Footer />
-        </div>
+      <body>
+        <Header />
+        <Sidebar />
+        {children}
       </body>
     </html>
   );

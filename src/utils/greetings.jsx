@@ -50,7 +50,7 @@ const Greeting = () => {
   return (
     <div>
       <h1 className="font-thin">
-        Olá<span className="font-bold"> Thiago</span>, {getGreeting()} Hoje é{" "}
+        Olá<span className="font-bold "> Thiago</span>, {getGreeting()} Hoje é{" "}
         {getDateInfo()}.
       </h1>
     </div>
