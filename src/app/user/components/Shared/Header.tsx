@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import Image from "next/image";
 
 interface HeaderProps {
@@ -8,17 +7,17 @@ interface HeaderProps {
 
 export default function Header({ onToggleSidebar }: HeaderProps) {
   return (
-    <nav className="bg-blue-500 p-4 fixed w-full z-40">
+    <nav className="bg-blue-500 p-4 fixed w-full z-40 top-0 left-0">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-white text-lg font-bold flex items-center">
           <Image
-            src="/images/logo.png" // Caminho relativo ao diretório `public`
+            src="/images/logo.png"
             alt="iControl Logo"
             width={40}
             height={40}
-            className="mr-2" // Margem direita para espaçar o texto
+            className="mr-2"
           />
-          <a href="/dashboard">iControl</a>
+          <a href="/user/dashboard">iControl</a>
         </div>
 
         {/* Hamburger Menu Button */}

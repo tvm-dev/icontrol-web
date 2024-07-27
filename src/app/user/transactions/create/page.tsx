@@ -1,10 +1,10 @@
 "use client";
 
-import { api } from "@/app/services/api";
-import { manualToken, userID } from "@/app/services/token";
+import { api } from "../../services/api";
+import { manualToken, userID } from "../../services/token";
 import axios from "axios";
 import { FormEvent, useRef, useEffect, useState } from "react";
-import { data } from "@/app/components/DropDownMenu/data";
+import { data } from "../../components/DropDownMenu/data";
 import Link from "next/link";
 
 // Mapeamento dos tipos para seus valores numéricos

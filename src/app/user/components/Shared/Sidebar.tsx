@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import {
@@ -24,6 +25,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
         setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
       }
     };
 
@@ -63,11 +66,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         >
           <div className="flex items-center mb-5">
             <Image
-              src="/images/logo.png" // Caminho relativo ao diretório `public`
+              src="/images/logo.png"
               alt="iControl Logo"
-              width={40} // Largura do logo
-              height={40} // Altura do logo
-              className="mr-2" // Margem direita para espaçar o texto
+              width={40}
+              height={40}
+              className="mr-2"
             />
             <h1 className="text-2xl font-bold">iControl</h1>
           </div>
@@ -121,15 +124,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </ul>
           </nav>
         </div>
-
         <div className="mt-auto p-4">
           <div className="flex items-center space-x-4">
             <Image
-              src="/images/tvm.jpg" // Caminho relativo ao diretório `public`
+              src="/images/tvm.jpg"
               alt="User Photo"
-              width={40} // Largura da foto do usuário
-              height={40} // Altura da foto do usuário
-              className="rounded-full" // Torna a imagem circular
+              width={40}
+              height={40}
+              className="rounded-full"
             />
             <div>
               <p className="text-sm font-semibold">Thiago Menezes</p>

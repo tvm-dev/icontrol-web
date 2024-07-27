@@ -1,4 +1,3 @@
-// src/app/user/layout.tsx
 "use client";
 import React, { useState } from "react";
 import Header from "./components/Shared/Header";
@@ -14,12 +13,23 @@ const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-screen">
+      {/* Header */}
       <Header onToggleSidebar={toggleSidebar} />
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {children}
+      <div className="flex flex-1 pt-16 md:pt-10">
+        {" "}
+        {/* Ajuste para evitar sobreposição */}
+        {/* Sidebar */}
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        {/* Content Area */}
+        <main className="flex-1 overflow-y-auto md:ml-64">{children}</main>
+      </div>
+      {/* Floating Button */}
       <FloatingButton />
+
+      {/* Footer */}
+      {/* <Footer /> */}
     </div>
   );
 };

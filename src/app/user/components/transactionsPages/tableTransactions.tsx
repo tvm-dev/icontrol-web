@@ -88,7 +88,7 @@ export default function TableTransactions({
   }, [transactions, currentMonth, updateTotals, filterType]);
 
   if (!transactions || transactions.length === 0) {
-    return <p className="py-5">Nenhuma transação encontrada!</p>;
+    return <p className="py-5 text-center">Nenhuma transação encontrada!</p>;
   }
 
   const transactionRows: JSX.Element[] = [];

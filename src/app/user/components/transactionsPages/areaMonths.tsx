@@ -31,7 +31,7 @@ export default function AreaMonth({ currentMonth, onMonthChange }: Props) {
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-gray-100 rounded-lg shadow-md">
+    <div className="flex items-center justify-center space-x-5 p-4 bg-gray-100 rounded-lg shadow-md">
       <button
         onClick={handlePrevMonth}
         className="text-xl text-gray-500 hover:text-gray-700"

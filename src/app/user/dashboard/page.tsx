@@ -83,35 +83,119 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="md:ml-64 p-4 pt-20">
-      <div className="flex flex-row justify-between my-2">
-        <h2 className="font-bold mt-2">Dashboard</h2>
+    <div className="md:ml-5 p-4 pt-5">
+      <div className="flex flex-row justify-between">
+        <h2 className="font-bold mt-2">Início</h2>
       </div>
 
-      <div className="text-center bg-blue-50 p-2 rounded mb-4">
+      <div className="text-center">
         <h2>
           <Greeting />
         </h2>
       </div>
+      {/* === */}
+
+      <div className="p-4">
+        {/* Container para os quatro blocos */}
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-4">
+          {/* Div de Saldo */}
+          <div className="bg-gradient-to-r from-blue-400 to-blue-600 text-white p-3 rounded-lg shadow-lg flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0">
+            <div className="flex flex-col items-start">
+              <h2 className="text-sm">Saldo</h2>
+              <p className="text-2xl font-bold mb-1">R$ 10.000</p>
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center">
+              <ul className="list-none text-xs flex flex-col space-y-1">
+                <li className="flex items-center space-x-1">
+                  <span className="font-semibold">Previsto:</span>
+                  <span>R$ 12.000</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          {/* Div de Receitas */}
+          <div className="bg-gradient-to-r from-green-400 to-green-600 text-white p-3 rounded-lg shadow-lg flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0">
+            <div className="flex flex-col items-start">
+              <h2 className="text-lg font-semibold mb-1">Receitas</h2>
+              <p className="text-2xl font-bold mb-1">R$ 5.000</p>
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center md:ml-2">
+              <ul className="list-none text-xs flex flex-col space-y-1">
+                <li className="flex items-center space-x-1">
+                  <span className="font-semibold">Prevista:</span>
+                  <span>R$ 20.000</span>
+                </li>
+                <li className="flex items-center space-x-1">
+                  <span className="font-semibold">Fixa:</span>
+                  <span>R$ 15.500</span>
+                </li>
+                <li className="flex items-center space-x-1">
+                  <span className="font-semibold">Variável:</span>
+                  <span>R$ 1.500</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          {/* Div de Despesas */}
+          <div className="bg-gradient-to-r from-red-400 to-red-600 text-white p-3 rounded-lg shadow-lg flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0">
+            <div className="flex flex-col items-start">
+              <h2 className="text-lg font-semibold mb-1">Despesas</h2>
+              <p className="text-2xl font-bold mb-1">R$ 3.000</p>
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center md:ml-2">
+              <ul className="list-none text-xs flex flex-col space-y-1">
+                <li className="flex items-center space-x-1">
+                  <span className="font-semibold">Previstas</span>
+                  <span>R$ 1.500</span>
+                </li>
+                <li className="flex items-center space-x-1">
+                  <span className="font-semibold">Fixa</span>
+                  <span>R$ 1.000</span>
+                </li>
+                <li className="flex items-center space-x-1">
+                  <span className="font-semibold">Variável</span>
+                  <span>R$ 500</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          {/* Div de Investimentos */}
+          <div className="bg-gradient-to-r from-teal-400 to-teal-600 text-white p-3 rounded-lg shadow-lg flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0">
+            <div className="flex flex-col items-start">
+              <h2 className="text-lg font-semibold mb-1">Investidos</h2>
+              <p className="text-2xl font-bold mb-1">R$ 2.000</p>
+              <p className="text-xs">Total este mês</p>
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center md:ml-2">
+              <ul className="list-none text-xs flex flex-col space-y-1">
+                <li className="flex items-center space-x-1">
+                  <span className="font-semibold">Total</span>
+                  <span>R$ 5000</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* === */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Balance */}
-        <div className="bg-blue-400 text-white text-center p-2 rounded-lg shadow-lg">
+        <div className="bg-blue-400 text-white text-center rounded-lg shadow-lg p-4">
           <p className="font-semibold">Saldos</p>
-          <div className="flex flex-col">
-            <div className="flex flex-1 justify-between items-center">
-              <div className="flex flex-col items-center flex-1">
-                <h1 className="font-bold text-xl">
-                  {formatCurrencyBRL((fiSum ?? 0) + (viSum ?? 0))}
-                </h1>
-                <p className="text-sm">Atual</p>
-              </div>
-              <div className="flex flex-col items-center flex-1">
-                <h1 className="font-bold text-2xl">
-                  <span className="font-thin text-sm">R$</span> ?
-                </h1>
-                <p className="text-sm">Previsto</p>
-              </div>
+          <div className="flex justify-between items-center mt-2">
+            <div className="flex flex-col items-center">
+              <h1 className="font-bold text-xl">
+                {formatCurrencyBRL((fiSum ?? 0) + (viSum ?? 0))}
+              </h1>
+              <p className="text-sm">em caixa</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <h1 className="font-bold text-xl">
+                <span className="font-thin text-sm">R$</span> ?
+              </h1>
+              <p className="text-sm">Previsto</p>
             </div>
           </div>
         </div>
@@ -180,7 +264,7 @@ export default function Dashboard() {
               <div className="flex flex-1 justify-between items-center">
                 <div className="flex flex-col items-center flex-1">
                   <h1 className="font-bold text-xl">
-                    <span className="font-thin text-sm"> - </span>
+                    <span className="font-thin text-sm"> </span>
                     {formatCurrencyBRL(inSum ?? 0)}
                   </h1>
                   <p className="text-sm">Este mês</p>
