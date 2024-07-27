@@ -75,7 +75,7 @@ export default function NewTransaction() {
 
       if (response.status === 200) {
         //alert("Transação Criada com Sucesso!");
-        window.location.href = "/transactions";
+        window.location.href = "/user/transactions";
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {

@@ -99,10 +99,10 @@ export default function TableTransactions({
 
     if (dateKey !== currentHeader) {
       transactionRows.push(
-        <tr key={`header-${transaction.id}`} className="bg-gray-100">
+        <tr key={`header-${transaction.id}`} className="border-2 ">
           <td
             colSpan={4}
-            className="text-blue-500 font-semibold p-2 text-sm border-r-2 align-middle"
+            className="text-blue-500 text-center font-semibold p-2 text-sm border-l-2 align-middle"
           >
             📅 {dateKey}
           </td>
@@ -114,7 +114,8 @@ export default function TableTransactions({
     transactionRows.push(
       <Link
         key={transaction.id}
-        href={`/transactions/edit/${transaction.id}`}
+        href={`/user/transactions/edit/${transaction.id}`}
+        className="border-l-2"
         passHref
         legacyBehavior
       >

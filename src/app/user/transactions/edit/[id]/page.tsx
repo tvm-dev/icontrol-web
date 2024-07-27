@@ -2,11 +2,11 @@
 
 import { useEffect, useState, ChangeEvent, FormEvent, useRef } from "react";
 import axios from "axios";
-import { api } from "@/app/services/api";
-import { manualToken } from "@/app/services/token";
+import { api } from "@/app/user/services/api";
+import { manualToken } from "@/app/user/services/token";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { data } from "@/app/components/DropDownMenu/data";
+import { data } from "@/app/user/components/DropDownMenu/data";
 interface EditTransactionProps {
   id: number;
   description: string;
@@ -199,7 +199,7 @@ export default function EditTransactionPage({
         headers: { Authorization: `Bearer ${manualToken}` },
       });
 
-      router.push("/transactions");
+      router.push("/user/transactions");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error(
@@ -226,7 +226,7 @@ export default function EditTransactionPage({
           headers: { Authorization: `Bearer ${manualToken}` },
         });
 
-        router.push("/transactions");
+        router.push("/user/transactions");
       } catch (error) {
         if (axios.isAxiosError(error)) {
           console.error(
@@ -246,7 +246,8 @@ export default function EditTransactionPage({
 
   if (isLoading) return <p>Carregando...</p>;
   if (error) return <p className="text-red-500 text-center">{error}</p>;
-  if (!formData) return <p>Transação não encontrada!</p>;
+  if (!formData)
+    return <p className="text-center">Transação não encontrada!</p>;
 
   return (
     <>
@@ -367,7 +368,7 @@ export default function EditTransactionPage({
           </div>
 
           <Link
-            href="/transactions"
+            href="/user/transactions"
             className="text-blue-500 text-center mt-10 border-b-2"
           >
             Voltar para todas as transações

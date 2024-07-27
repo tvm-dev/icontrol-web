@@ -9,11 +9,8 @@ const FloatingButton: React.FC = () => {
       bounds="body" // Limita o movimento dentro da área visível
     >
       <div className="fixed bottom-8 right-8 z-50">
-        <Link href="/transactions/create">
-          <button
-            className="bg-blue-500 text-white w-16 h-16 rounded-full shadow-lg hover:bg-blue-600 transition duration-300 flex items-center justify-center text-3xl leading-tight"
-            aria-label="Criar Nova Transação"
-          >
+        <Link href="/user/transactions/create">
+          <button className="bg-blue-500 text-white w-16 h-16 rounded-full shadow-lg hover:bg-blue-600 transition duration-300 flex items-center justify-center text-4xl font-bold">
             +
           </button>
         </Link>

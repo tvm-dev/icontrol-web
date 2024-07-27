@@ -2,10 +2,10 @@
 
 import { useEffect, useState, ChangeEvent, FormEvent, useRef } from "react";
 import axios from "axios";
-import { api } from "@/app/services/api";
-import { manualToken } from "@/app/services/token";
+import { api } from "../../services/api";
+import { manualToken } from "../../services/token";
 import { useRouter } from "next/navigation";
-import DependentDropdown from "@/app/components/DropDownMenu/Menu";
+import DependentDropdown from "../DropDownMenu/Menu";
 
 interface EditTransactionProps {
   id: number;
@@ -119,7 +119,7 @@ export default function EditTransaction({
         headers: { Authorization: `Bearer ${manualToken}` },
       });
 
-      router.push("/transactions");
+      router.push("/user/transactions");
 
       setIsLoading(false);
     } catch (error) {
