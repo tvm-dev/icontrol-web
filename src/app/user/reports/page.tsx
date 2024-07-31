@@ -6,8 +6,11 @@ import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { manualToken } from "../services/token";
 import * as XLSX from "xlsx";
-import pdfMake from "./pdfMakeConfig";
 import Papa from "papaparse";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // Mapeamento de tipos de transação
 const typeMapping: Record<number, string> = {
@@ -57,10 +60,11 @@ const groupTransactionsByMonth = (transactions: Transaction[]) => {
   return grouped;
 };
 
+//==============================================================================
 const calculateTotalsByMonth = (transactions: Transaction[]) => {
   const totals: Record<
     string,
-    { income: number; expenses: number; total: number }
+    { income: number; expenses: number; investments: number; total: number }
   > = {};
 
   transactions.forEach((transaction) => {
@@ -68,24 +72,35 @@ const calculateTotalsByMonth = (transactions: Transaction[]) => {
     const monthYear = formatMonthYear(date);
 
     if (!totals[monthYear]) {
-      totals[monthYear] = { income: 0, expenses: 0, total: 0 };
+      totals[monthYear] = { income: 0, expenses: 0, investments: 0, total: 0 };
     }
 
     const amount = transaction.amount;
-    if (transaction.type === 1 || transaction.type === 2) {
-      // Assuming 1 and 2 are for income
-      totals[monthYear].income += amount;
-    } else {
-      // Assuming others are for expenses
-      totals[monthYear].expenses += amount;
+    switch (transaction.type) {
+      case 1: // Receita
+      case 2: // Receita
+        totals[monthYear].income += amount;
+        break;
+      case 3: // Despesa
+      case 4: // Despesa
+        totals[monthYear].expenses += amount;
+        break;
+      case 5: // Investimento
+        totals[monthYear].investments += amount;
+        break;
+      default:
+        break;
     }
 
     totals[monthYear].total =
-      totals[monthYear].income - totals[monthYear].expenses;
+      totals[monthYear].income -
+      (totals[monthYear].expenses + totals[monthYear].investments);
   });
 
   return totals;
 };
+
+//==============================================================================
 
 export default function PageReports() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -182,6 +197,7 @@ export default function PageReports() {
       "Detalhes",
       "Pagamento",
       "Pago",
+      "Saldo",
     ];
 
     // Remove a coluna `id` e traduz os dados conforme os cabeçalhos
@@ -196,22 +212,43 @@ export default function PageReports() {
       Detalhes: transaction.details ?? "N/A",
       Pagamento: transaction.payment ?? "N/A",
       Pago: transaction.paid ? "Sim" : "Não",
+      Saldo: "", // Placeholder, will be calculated in the next step
     }));
 
     // Cria a planilha com os cabeçalhos e dados traduzidos
     const ws = XLSX.utils.json_to_sheet(filteredData, { header: headers });
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Relatório Excel");
+
+    // Calculate balance and add to the XLSX file ===========================================
+    const totalsByMonth = calculateTotalsByMonth(data);
+    Object.keys(totalsByMonth).forEach((monthYear, index) => {
+      const { balance } = totalsByMonth[monthYear];
+      const rowIndex = index + 2; // Adjust for header rows
+      ws[`I${rowIndex}`] = { v: balance.toFixed(2).replace(".", ",") }; // Balance in column I
+    });
+
     XLSX.writeFile(wb, "relatorio.xlsx");
   };
 
-  ///===========
-
+  ///================================================================
   const generatePDF = (data: Transaction[]) => {
     const groupedData = groupTransactionsByMonth(data);
     const totalsByMonth = calculateTotalsByMonth(data);
 
     const body: any[] = [];
+
+    // Cria o cabeçalho da tabela
+    body.push([
+      "Data",
+      "Descrição",
+      "Valor",
+      "Categoria",
+      "Tipo",
+      "Detalhes",
+      "Pagamento",
+      "Pago",
+    ]);
 
     Object.keys(groupedData).forEach((monthYear) => {
       const transactions = groupedData[monthYear];
@@ -227,16 +264,6 @@ export default function PageReports() {
         {},
         {},
       ]);
-      body.push([
-        "Data",
-        "Descrição",
-        "Valor",
-        "Categoria",
-        "Tipo",
-        "Detalhes",
-        "Pagamento",
-        "Pago",
-      ]);
 
       transactions.forEach((transaction) => {
         body.push([
@@ -244,7 +271,9 @@ export default function PageReports() {
             timeZone: "UTC",
           }),
           transaction.description,
-          transaction.amount.toFixed(2).replace(".", ","),
+          typeof transaction.amount === "number"
+            ? transaction.amount.toFixed(2).replace(".", ",")
+            : "N/A",
           transaction.category,
           typeMapping[transaction.type] || "Unknown",
           transaction.details ?? "N/A",
@@ -253,30 +282,83 @@ export default function PageReports() {
         ]);
       });
 
+      // Adiciona as linhas de totais
       body.push([
         { text: "Totais", colSpan: 2 },
         {},
         {
-          text: `Receitas: ${totals.income.toFixed(2).replace(".", ",")}`,
+          text: `Receitas: ${
+            typeof totals.income === "number"
+              ? totals.income.toFixed(2).replace(".", ",")
+              : "N/A"
+          }`,
           colSpan: 6,
         },
         {},
+        {},
+        {},
+        {},
+        {},
+      ]);
+
+      body.push([
+        {},
+        {},
         {
-          text: `Despesas: ${totals.expenses.toFixed(2).replace(".", ",")}`,
+          text: `Despesas: ${
+            typeof totals.expenses === "number"
+              ? totals.expenses.toFixed(2).replace(".", ",")
+              : "N/A"
+          }`,
           colSpan: 6,
         },
         {},
+        {},
+        {},
+        {},
+        {},
+      ]);
+
+      body.push([
+        {},
+        {},
         {
-          text: `Saldo: ${totals.total.toFixed(2).replace(".", ",")}`,
+          text: `Investimentos: ${
+            typeof totals.investments === "number"
+              ? totals.investments.toFixed(2).replace(".", ",")
+              : "N/A"
+          }`,
           colSpan: 6,
         },
+        {},
+        {},
+        {},
+        {},
+        {},
+      ]);
+
+      body.push([
+        {},
+        {},
+        {
+          text: `Saldo: ${
+            typeof totals.total === "number"
+              ? totals.total.toFixed(2).replace(".", ",")
+              : "N/A"
+          }`,
+          colSpan: 6,
+        },
+        {},
+        {},
+        {},
+        {},
         {},
       ]);
     });
 
     const docDefinition = {
       pageOrientation: "landscape",
-      pageMargins: [40, 60, 40, 80], // Adjusted bottom margin for footer
+      pageMargins: [40, 60, 40, 80],
       content: [
         {
           text: "iControl: porque VC controla sua grana!",
@@ -308,7 +390,7 @@ export default function PageReports() {
           },
           { text: "icontrol.com", alignment: "center", color: "blue" },
         ],
-        margin: [10, 0, 10, 10], // Adjust margin for footer
+        margin: [10, 0, 10, 10],
       }),
       styles: {
         title: { fontSize: 24, bold: true, margin: [0, 20, 0, 10] },
@@ -328,6 +410,8 @@ export default function PageReports() {
       console.error("pdfMake não está definido.");
     }
   };
+
+  ///================================================================
 
   const handleGenerateReport = () => {
     if (!reportType) {
