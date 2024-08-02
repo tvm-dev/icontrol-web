@@ -85,7 +85,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <span>Início</span>
                 </a>
               </li>
-              <li className="mt-2">
+              <li className="">
                 <a
                   href="/user/transactions"
                   className="flex items-center space-x-4 p-2 hover:bg-gray-600 transition-colors duration-300 rounded"
@@ -94,7 +94,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <span>Transações</span>
                 </a>
               </li>
-              <li className="mt-2">
+              <li className="">
                 <a
                   href="/user/investments"
                   className="flex items-center space-x-4 p-2 hover:bg-gray-600 transition-colors duration-300 rounded"
@@ -103,7 +103,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <span>Investimentos</span>
                 </a>
               </li>
-              <li className="mt-2">
+              <li className="">
                 <a
                   href="/user/reports"
                   className="flex items-center space-x-4 p-2 hover:bg-gray-600 transition-colors duration-300 rounded"
@@ -112,7 +112,18 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <span>Relatórios</span>
                 </a>
               </li>
-              <li className="mt-2">
+
+              <li className="">
+                <a
+                  href="/user/categories"
+                  className="flex items-center space-x-4 p-2 hover:bg-gray-600 transition-colors duration-300 rounded"
+                >
+                  <DocumentTextIcon className="h-6 w-6 text-gray-300" />
+                  <span>Categorias</span>
+                </a>
+              </li>
+
+              <li className="">
                 <a
                   href="/user"
                   className="flex items-center space-x-4 p-2 hover:bg-gray-600 transition-colors duration-300 rounded"
@@ -124,7 +135,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </ul>
           </nav>
         </div>
-        <div className="mt-auto p-4">
+        <div className="flex flex-col justify-between p-4">
           <div className="flex items-center space-x-4">
             <Image
               src="/images/tvm.jpg"
@@ -138,7 +149,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               <p className="text-xs text-gray-400">senadorx@gmail.com</p>
             </div>
           </div>
-          <button className="mt-4 w-full bg-red-500 text-white p-2 rounded hover:bg-red-600">
+          <button className=" w-1/2 self-center mt-2 text-white p-2 border border-red-100 text-sm px-2 py-1 rounded hover:bg-red-600 transition duration-1000">
             Sair
           </button>
         </div>
