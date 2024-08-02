@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { api } from "../services/api"; // Verifique se o caminho está correto
-import { manualToken } from "../services/token"; // Verifique se o caminho está correto
+import { manualToken, userID } from "../services/token"; // Verifique se o caminho está correto
 import axios from "axios";
 
 interface SubCategory {
@@ -24,43 +24,48 @@ const CategoriesPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("expense");
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await api.get("/categories", {
-          headers: { Authorization: `Bearer ${manualToken}` },
-        });
-        setCategories(response.data);
-      } catch (error: unknown) {
-        if (axios.isAxiosError(error)) {
-          console.error(
-            "Erro ao carregar categorias:",
-            error.response?.data ?? error.message
-          );
-        } else {
-          console.error("Erro desconhecido ao carregar categorias:", error);
-        }
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get("/categories", {
+        headers: { Authorization: `Bearer ${manualToken}` },
+      });
+      setCategories(response.data);
+      console.log("Categories fetched successfully:", response.data);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Erro ao carregar categorias:",
+          error.response?.data ?? error.message
+        );
+      } else {
+        console.error("Erro desconhecido ao carregar categorias:", error);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     fetchCategories();
   }, []);
 
+  //==Creating new Category:
   const handleCreateCategory = async () => {
     if (newCategoryName.trim() === "") return;
 
     try {
       setLoading(true);
-      const response = await api.post(
-        "/categories",
+      await api.post(
+        "/category", // Certifique-se de que este é o endpoint correto
         {
           name: newCategoryName,
           typeCategory: newCategoryType,
+          userID: 1, // Passe o userID adequado aqui
         },
         {
           headers: { Authorization: `Bearer ${manualToken}` },
         }
       );
-      setCategories([...categories, response.data]);
+      // Atualiza a lista de categorias após a criação
+      await fetchCategories();
       setNewCategoryName("");
       setNewCategoryType("expense");
       setShowModal(false);
@@ -78,16 +83,18 @@ const CategoriesPage = () => {
     }
   };
 
+  //end
+
   const filteredCategories = categories.filter(
     (cat) => cat.typeCategory === activeTab
   );
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold m-4">Categorias e Subcategorias</h1>
+    <div className="p-4 text-center">
+      <h1 className="text-3xl font-bold m-6">Categorias</h1>
 
       {/* Abas */}
-      <div className="flex space-x-4 mb-6">
+      <div className="flex space-x-4 mb-6 text-center items-center justify-center ">
         <button
           onClick={() => setActiveTab("expense")}
           className={`px-4 py-2 rounded-t-lg ${
@@ -125,9 +132,9 @@ const CategoriesPage = () => {
         onClick={() => setShowModal(true)}
         className="bg-blue-500 text-white px-4 py-2 rounded mb-6"
       >
-        Adicionar Nova Categoria
+        + Nova
       </button>
-
+      <hr />
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
@@ -168,18 +175,27 @@ const CategoriesPage = () => {
 
       {/* Conteúdo da Aba Ativa */}
       <div className="space-y-6">
-        {filteredCategories.map((cat) => (
-          <div key={cat.id} className="bg-gray-100 p-4 rounded-lg shadow">
-            <h2 className="text-xl font-semibold">{cat.name}</h2>
-            <ul className="list-disc pl-5 mt-2">
-              {cat.subCategories.map((sub) => (
-                <li key={sub.id} className="text-sm text-gray-700">
-                  {sub.name}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        {filteredCategories.length === 0 ? (
+          <p className="text-red-500 text-center ">
+            Não há categorias cadastradas.
+          </p>
+        ) : (
+          filteredCategories.map((cat) => (
+            <div
+              key={cat.id}
+              className="bg-gray-100 p-1 text-left rounded-lg shadow"
+            >
+              <h2 className="text-xl font-semibold">{cat.name}</h2>
+              <ul className="list-disc pl-5 mt-2">
+                {cat.subCategories.map((sub) => (
+                  <li key={sub.id} className="text-sm text-gray-700">
+                    {sub.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

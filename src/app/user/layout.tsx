@@ -23,7 +23,7 @@ const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {/* Sidebar */}
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto md:ml-64 bg-slate-600 ">
+        <main className="flex-1 overflow-y-auto md:ml-64 bg-slate-100 ">
           {children}
         </main>
       </div>
