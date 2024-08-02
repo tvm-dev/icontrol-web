@@ -29,6 +29,20 @@ const CategoriesPage = () => {
     useState<boolean>(false);
   const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
 
+  // Subcategoria
+  const [editSubCategoryId, setEditSubCategoryId] = useState<number | null>(
+    null
+  );
+  const [editSubCategoryName, setEditSubCategoryName] = useState<string>("");
+  const [showSubCategoryModal, setShowSubCategoryModal] =
+    useState<boolean>(false);
+  const [subCategoryToDelete, setSubCategoryToDelete] = useState<number | null>(
+    null
+  );
+  const [categoryForSubCategory, setCategoryForSubCategory] = useState<
+    number | null
+  >(null);
+
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -119,6 +133,71 @@ const CategoriesPage = () => {
     }
   };
 
+  const handleCreateSubCategory = async () => {
+    if (editSubCategoryName.trim() === "" || categoryForSubCategory === null)
+      return;
+
+    try {
+      setLoading(true);
+      await api.post(
+        "/subcategory",
+        {
+          name: editSubCategoryName,
+          categoryID: categoryForSubCategory,
+        },
+        {
+          headers: { Authorization: `Bearer ${manualToken}` },
+        }
+      );
+      fetchCategories();
+      setEditSubCategoryName("");
+      setShowSubCategoryModal(false);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Erro ao criar subcategoria:",
+          error.response?.data ?? error.message
+        );
+      } else {
+        console.error("Erro desconhecido ao criar subcategoria:", error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditSubCategory = async () => {
+    if (editSubCategoryId === null || editSubCategoryName.trim() === "") return;
+
+    try {
+      setLoading(true);
+      await api.put(
+        `/subcategory?id=${editSubCategoryId}`,
+        {
+          name: editSubCategoryName,
+        },
+        {
+          headers: { Authorization: `Bearer ${manualToken}` },
+        }
+      );
+      fetchCategories();
+      setEditSubCategoryId(null);
+      setEditSubCategoryName("");
+      setShowSubCategoryModal(false);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Erro ao editar subcategoria:",
+          error.response?.data ?? error.message
+        );
+      } else {
+        console.error("Erro desconhecido ao editar subcategoria:", error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const openConfirmDeleteModal = (id: number) => {
     setCategoryToDelete(id);
     setShowConfirmDeleteModal(true);
@@ -155,6 +234,51 @@ const CategoriesPage = () => {
     setShowConfirmDeleteModal(false);
   };
 
+  const openSubCategoryModal = (categoryId: number) => {
+    setCategoryForSubCategory(categoryId);
+    setShowSubCategoryModal(true);
+  };
+
+  const openEditSubCategoryModal = (
+    subCategoryId: number,
+    subCategoryName: string
+  ) => {
+    setEditSubCategoryId(subCategoryId);
+    setEditSubCategoryName(subCategoryName);
+    setShowSubCategoryModal(true);
+  };
+
+  const handleConfirmSubCategoryDelete = async () => {
+    if (subCategoryToDelete === null) return;
+
+    try {
+      setLoading(true);
+      await api.delete("/subcategory", {
+        params: { id: subCategoryToDelete },
+        headers: { Authorization: `Bearer ${manualToken}` },
+      });
+      fetchCategories();
+      setSubCategoryToDelete(null);
+      setShowSubCategoryModal(false);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Erro ao excluir subcategoria:",
+          error.response?.data ?? error.message
+        );
+      } else {
+        console.error("Erro desconhecido ao excluir subcategoria:", error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelSubCategoryDelete = () => {
+    setSubCategoryToDelete(null);
+    setShowSubCategoryModal(false);
+  };
+
   const filteredCategories = categories.filter(
     (cat) => cat.typeCategory === activeTab
   );
@@ -164,7 +288,7 @@ const CategoriesPage = () => {
       <h1 className="text-3xl font-bold m-6">Categorias</h1>
 
       {/* Abas */}
-      <div className="flex space-x-4 mb-6 text-center items-center justify-center ">
+      <div className="flex space-x-4 mb-6 text-center items-center justify-center">
         <button
           onClick={() => setActiveTab("expense")}
           className={`px-4 py-2 rounded-t-lg ${
@@ -197,150 +321,192 @@ const CategoriesPage = () => {
         </button>
       </div>
 
-      {/* Adicionar Nova Categoria */}
-      <button
-        onClick={() => setShowModal(true)}
-        className="bg-blue-500 text-white px-4 py-2 rounded mb-6"
-      >
-        + Nova
-      </button>
-      <hr />
+      <div className="mb-6">
+        <button
+          onClick={() => setShowModal(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+        >
+          Adicionar Categoria
+        </button>
+      </div>
 
-      {/* Modal de Criação de Categoria */}
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Adicionar Categoria</h2>
-            <input
-              type="text"
-              placeholder="Nome da Categoria"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              className="p-2 border border-blue-500 rounded mb-4 w-full bg-blue-50"
-            />
-            <select
-              value={newCategoryType}
-              onChange={(e) => setNewCategoryType(e.target.value)}
-              className="p-2 border border-blue-500 rounded mb-4 w-full bg-blue-50"
-            >
-              <option value="expense">Despesa</option>
-              <option value="income">Receita</option>
-              <option value="investment">Investimento</option>
-            </select>
-            <button
-              onClick={handleCreateCategory}
-              className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
-              disabled={loading}
-            >
-              {loading ? "Criando..." : "Adicionar"}
-            </button>
-            <button
-              onClick={() => setShowModal(false)}
-              className="bg-gray-500 text-white px-4 py-2 rounded"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de Edição de Categoria */}
-      {editCategoryId !== null && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Editar Categoria</h2>
-            <input
-              type="text"
-              placeholder="Nome da Categoria"
-              value={editCategoryName}
-              onChange={(e) => setEditCategoryName(e.target.value)}
-              className="p-2 border border-blue-500 rounded mb-4 w-full bg-blue-50"
-            />
-            <select
-              value={newCategoryType}
-              onChange={(e) => setNewCategoryType(e.target.value)}
-              className="p-2 border border-blue-500 rounded mb-4 w-full bg-blue-50"
-            >
-              <option value="expense">Despesa</option>
-              <option value="income">Receita</option>
-              <option value="investment">Investimento</option>
-            </select>
-            <button
-              onClick={handleEditCategory}
-              className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
-              disabled={loading}
-            >
-              {loading ? "Salvando..." : "Salvar"}
-            </button>
-            <button
-              onClick={() => setEditCategoryId(null)}
-              className="bg-gray-500 text-white px-4 py-2 rounded"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Lista de Categorias */}
-      <div>
+      <div className="overflow-x-auto">
         {filteredCategories.length === 0 ? (
           <p className="text-gray-500">Nenhuma categoria cadastrada.</p>
         ) : (
-          <ul>
-            {filteredCategories.map((category) => (
-              <li key={category.id} className="border p-4 mb-2 rounded">
-                <h3 className="text-xl font-semibold">{category.name}</h3>
-                <div className="mt-2">
+          filteredCategories.map((category) => (
+            <div
+              key={category.id}
+              className="border-b border-gray-300 pb-4 mb-4"
+            >
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold">{category.name}</h2>
+                <div className="space-x-2">
                   <button
                     onClick={() => {
                       setEditCategoryId(category.id);
                       setEditCategoryName(category.name);
+                      setNewCategoryType(category.typeCategory);
                       setShowModal(true);
                     }}
-                    className="bg-yellow-500 text-white px-4 py-2 rounded mr-2"
+                    className="text-blue-500 hover:text-blue-700"
                   >
                     Editar
                   </button>
                   <button
                     onClick={() => openConfirmDeleteModal(category.id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded"
+                    className="text-red-500 hover:text-red-700"
                   >
-                    Excluir
+                    Deletar
+                  </button>
+                  <button
+                    onClick={() => openSubCategoryModal(category.id)}
+                    className="text-green-500 hover:text-green-700"
+                  >
+                    Adicionar Subcategoria
                   </button>
                 </div>
-              </li>
-            ))}
-          </ul>
+              </div>
+              <div className="mt-2">
+                {category.subCategories.length === 0 ? (
+                  <p className="text-gray-500">Nenhuma subcategoria.</p>
+                ) : (
+                  <ul>
+                    {category.subCategories.map((subCategory) => (
+                      <li
+                        key={subCategory.id}
+                        className="flex justify-between items-center"
+                      >
+                        <span>{subCategory.name}</span>
+                        <div className="space-x-2">
+                          <button
+                            onClick={() =>
+                              openEditSubCategoryModal(
+                                subCategory.id,
+                                subCategory.name
+                              )
+                            }
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSubCategoryToDelete(subCategory.id);
+                              setShowSubCategoryModal(true);
+                            }}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            Deletar
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          ))
         )}
       </div>
 
-      {/* Modal de Confirmação de Exclusão */}
+      {/* Modal Adicionar/Editar Categoria */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">
+              {editCategoryId ? "Editar Categoria" : "Adicionar Categoria"}
+            </h2>
+            <input
+              type="text"
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="Nome da Categoria"
+              className="border border-gray-300 p-2 mb-4 w-full"
+            />
+            <select
+              value={newCategoryType}
+              onChange={(e) => setNewCategoryType(e.target.value)}
+              className="border border-gray-300 p-2 mb-4 w-full"
+            >
+              <option value="expense">Despesa</option>
+              <option value="income">Receita</option>
+              <option value="investment">Investimento</option>
+            </select>
+            <div className="flex space-x-2">
+              <button
+                onClick={
+                  editCategoryId ? handleEditCategory : handleCreateCategory
+                }
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+              >
+                {editCategoryId ? "Salvar" : "Adicionar"}
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="bg-gray-300 px-4 py-2 rounded-lg"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Confirmar Exclusão Categoria */}
       {showConfirmDeleteModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Confirmar Exclusão:</h2>
-            <h3 className="font-bold">Aviso importante:</h3>
-            <p className="mb-4 text-red-500">
-              Se esta categoria tiver subcategorias, ela não será apagada. Você
-              precisa, antes, excluir as subcategorias ou movê-las para outra
-              Categoria.
-            </p>
-            <p className="mb-4">
-              {" "}
-              Tem certeza de que deseja excluir esta categoria?
-            </p>
-            <div className="flex justify-end">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">Confirmar Exclusão</h2>
+            <p>Tem certeza de que deseja excluir esta categoria?</p>
+            <div className="flex space-x-2 mt-4">
               <button
                 onClick={handleConfirmDelete}
-                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
-                disabled={loading}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg"
               >
-                {loading ? "Excluindo..." : "Confirmar"}
+                Confirmar
               </button>
               <button
                 onClick={handleCancelDelete}
-                className="bg-gray-500 text-white px-4 py-2 rounded"
+                className="bg-gray-300 px-4 py-2 rounded-lg"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Adicionar/Editar Subcategoria */}
+      {showSubCategoryModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">
+              {editSubCategoryId
+                ? "Editar Subcategoria"
+                : "Adicionar Subcategoria"}
+            </h2>
+            <input
+              type="text"
+              value={editSubCategoryName}
+              onChange={(e) => setEditSubCategoryName(e.target.value)}
+              placeholder="Nome da Subcategoria"
+              className="border border-gray-300 p-2 mb-4 w-full"
+            />
+            <div className="flex space-x-2">
+              <button
+                onClick={
+                  editSubCategoryId
+                    ? handleEditSubCategory
+                    : handleCreateSubCategory
+                }
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+              >
+                {editSubCategoryId ? "Salvar" : "Adicionar"}
+              </button>
+              <button
+                onClick={() => setShowSubCategoryModal(false)}
+                className="bg-gray-300 px-4 py-2 rounded-lg"
               >
                 Cancelar
               </button>
