@@ -23,6 +23,15 @@ const CategoriesPage = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("expense");
+  const [editCategoryId, setEditCategoryId] = useState<number | null>(null);
+  const [editCategoryName, setEditCategoryName] = useState<string>("");
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] =
+    useState<boolean>(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const fetchCategories = async () => {
     try {
@@ -43,29 +52,23 @@ const CategoriesPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  //==Creating new Category:
   const handleCreateCategory = async () => {
     if (newCategoryName.trim() === "") return;
 
     try {
       setLoading(true);
       await api.post(
-        "/category", // Certifique-se de que este é o endpoint correto
+        "/category",
         {
           name: newCategoryName,
           typeCategory: newCategoryType,
-          userID: 1, // Passe o userID adequado aqui
+          userID: userID, // Passe o userID adequado aqui
         },
         {
           headers: { Authorization: `Bearer ${manualToken}` },
         }
       );
-      // Atualiza a lista de categorias após a criação
-      await fetchCategories();
+      fetchCategories();
       setNewCategoryName("");
       setNewCategoryType("expense");
       setShowModal(false);
@@ -83,7 +86,74 @@ const CategoriesPage = () => {
     }
   };
 
-  //end
+  const handleEditCategory = async () => {
+    if (editCategoryId === null || editCategoryName.trim() === "") return;
+
+    try {
+      setLoading(true);
+      await api.put(
+        `/category?id=${editCategoryId}`,
+        {
+          name: editCategoryName,
+          typeCategory: newCategoryType, // Use o tipo da nova categoria se estiver alterando
+          userID: userID,
+        },
+        {
+          headers: { Authorization: `Bearer ${manualToken}` },
+        }
+      );
+      fetchCategories();
+      setEditCategoryId(null);
+      setEditCategoryName("");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Erro ao editar categoria:",
+          error.response?.data ?? error.message
+        );
+      } else {
+        console.error("Erro desconhecido ao editar categoria:", error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openConfirmDeleteModal = (id: number) => {
+    setCategoryToDelete(id);
+    setShowConfirmDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (categoryToDelete === null) return;
+
+    try {
+      setLoading(true);
+      await api.delete("/category", {
+        params: { id: categoryToDelete },
+        headers: { Authorization: `Bearer ${manualToken}` },
+      });
+      fetchCategories();
+      setCategoryToDelete(null);
+      setShowConfirmDeleteModal(false);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Erro ao excluir categoria:",
+          error.response?.data ?? error.message
+        );
+      } else {
+        console.error("Erro desconhecido ao excluir categoria:", error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setCategoryToDelete(null);
+    setShowConfirmDeleteModal(false);
+  };
 
   const filteredCategories = categories.filter(
     (cat) => cat.typeCategory === activeTab
@@ -135,7 +205,8 @@ const CategoriesPage = () => {
         + Nova
       </button>
       <hr />
-      {/* Modal */}
+
+      {/* Modal de Criação de Categoria */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
@@ -173,30 +244,110 @@ const CategoriesPage = () => {
         </div>
       )}
 
-      {/* Conteúdo da Aba Ativa */}
-      <div className="space-y-6">
-        {filteredCategories.length === 0 ? (
-          <p className="text-red-500 text-center ">
-            Não há categorias cadastradas.
-          </p>
-        ) : (
-          filteredCategories.map((cat) => (
-            <div
-              key={cat.id}
-              className="bg-gray-100 p-1 text-left rounded-lg shadow"
+      {/* Modal de Edição de Categoria */}
+      {editCategoryId !== null && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4">Editar Categoria</h2>
+            <input
+              type="text"
+              placeholder="Nome da Categoria"
+              value={editCategoryName}
+              onChange={(e) => setEditCategoryName(e.target.value)}
+              className="p-2 border border-blue-500 rounded mb-4 w-full bg-blue-50"
+            />
+            <select
+              value={newCategoryType}
+              onChange={(e) => setNewCategoryType(e.target.value)}
+              className="p-2 border border-blue-500 rounded mb-4 w-full bg-blue-50"
             >
-              <h2 className="text-xl font-semibold">{cat.name}</h2>
-              <ul className="list-disc pl-5 mt-2">
-                {cat.subCategories.map((sub) => (
-                  <li key={sub.id} className="text-sm text-gray-700">
-                    {sub.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
+              <option value="expense">Despesa</option>
+              <option value="income">Receita</option>
+              <option value="investment">Investimento</option>
+            </select>
+            <button
+              onClick={handleEditCategory}
+              className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+              disabled={loading}
+            >
+              {loading ? "Salvando..." : "Salvar"}
+            </button>
+            <button
+              onClick={() => setEditCategoryId(null)}
+              className="bg-gray-500 text-white px-4 py-2 rounded"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Lista de Categorias */}
+      <div>
+        {filteredCategories.length === 0 ? (
+          <p className="text-gray-500">Nenhuma categoria cadastrada.</p>
+        ) : (
+          <ul>
+            {filteredCategories.map((category) => (
+              <li key={category.id} className="border p-4 mb-2 rounded">
+                <h3 className="text-xl font-semibold">{category.name}</h3>
+                <div className="mt-2">
+                  <button
+                    onClick={() => {
+                      setEditCategoryId(category.id);
+                      setEditCategoryName(category.name);
+                      setShowModal(true);
+                    }}
+                    className="bg-yellow-500 text-white px-4 py-2 rounded mr-2"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => openConfirmDeleteModal(category.id)}
+                    className="bg-red-500 text-white px-4 py-2 rounded"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
+
+      {/* Modal de Confirmação de Exclusão */}
+      {showConfirmDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4">Confirmar Exclusão:</h2>
+            <h3 className="font-bold">Aviso importante:</h3>
+            <p className="mb-4 text-red-500">
+              Se esta categoria tiver subcategorias, ela não será apagada. Você
+              precisa, antes, excluir as subcategorias ou movê-las para outra
+              Categoria.
+            </p>
+            <p className="mb-4">
+              {" "}
+              Tem certeza de que deseja excluir esta categoria?
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={handleConfirmDelete}
+                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                disabled={loading}
+              >
+                {loading ? "Excluindo..." : "Confirmar"}
+              </button>
+              <button
+                onClick={handleCancelDelete}
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
