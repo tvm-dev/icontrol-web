@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 import { api } from "../services/api"; // Verifique se o caminho está correto
 import { manualToken, userID } from "../services/token"; // Verifique se o caminho está correto
 import axios from "axios";
+import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { BiEditAlt } from "react-icons/bi";
+import { IoTrashBinSharp } from "react-icons/io5";
+import { MdEdit } from "react-icons/md";
 
 interface SubCategory {
   id: number;
@@ -333,77 +337,89 @@ const CategoriesPage = () => {
 
   return (
     <div className="p-4 text-center">
-      <h1 className="text-3xl font-bold m-6">Categorias</h1>
-      <div className="mb-6">
+      <h1 className="text-3xl font-bold">Categorias</h1>
+      <p className="font-thin mb-2">
+        Para adicionar uma nova categoria, clique no botão +
+      </p>
+      <div className="mb-6"></div>
+      {/* Abas */}
+      <div className="flex items-center justify-center mb-6">
+        {/* Botão de Adicionar Nova Categoria */}
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+          className="bg-blue-500 text-white p-2 rounded-lg mr-4"
+          aria-label="Adicionar Categoria"
         >
-          Adicionar Categoria
+          <FaPlus title="Nova Categoria" size={25} />
         </button>
+
+        {/* Abas */}
+        <div className="flex space-x-4 text-center items-center justify-center">
+          <button
+            onClick={() => setActiveTab("expense")}
+            className={`px-4 py-2 rounded-t-lg ${
+              activeTab === "expense"
+                ? "bg-red-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            Despesas
+          </button>
+          <button
+            onClick={() => setActiveTab("income")}
+            className={`px-4 py-2 rounded-t-lg ${
+              activeTab === "income"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            Receitas
+          </button>
+          <button
+            onClick={() => setActiveTab("investment")}
+            className={`px-4 py-2 rounded-t-lg ${
+              activeTab === "investment"
+                ? "bg-[#fde047] text-black"
+                : "bg-gray-200 text-gray-900"
+            }`}
+          >
+            Investimentos
+          </button>
+        </div>
       </div>
-      {/* Abas */}
-      <div className="flex space-x-4 mb-6 text-center items-center justify-center">
-        <button
-          onClick={() => setActiveTab("expense")}
-          className={`px-4 py-2 rounded-t-lg ${
-            activeTab === "expense"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-700"
-          }`}
-        >
-          Despesas
-        </button>
-        <button
-          onClick={() => setActiveTab("income")}
-          className={`px-4 py-2 rounded-t-lg ${
-            activeTab === "income"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-700"
-          }`}
-        >
-          Receitas
-        </button>
-        <button
-          onClick={() => setActiveTab("investment")}
-          className={`px-4 py-2 rounded-t-lg ${
-            activeTab === "investment"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-700"
-          }`}
-        >
-          Investimentos
-        </button>
-      </div>
-      {/* Categorias */}
+
       <div>
+        {/* Categorias */}
         {filteredCategories.length === 0 ? (
           <p className="text-gray-500">Não há categorias cadastradas.</p>
         ) : (
           <ul className="space-y-4">
             {filteredCategories.map((category) => (
               <li key={category.id} className="border p-4 rounded-lg shadow-md">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-start gap-3 ">
                   <h2 className="text-xl font-semibold">{category.name}</h2>
-                  <div>
+                  <div className="flex space-x-2">
                     <button
                       onClick={() => {
                         setEditCategoryId(category.id);
                         setEditCategoryName(category.name);
                         setShowModal(true);
                       }}
-                      className="bg-green-500 text-white px-4 py-2 rounded-lg mx-2"
+                      className="bg-green-500 text-white p-2 rounded-lg"
+                      aria-label="Editar Categoria"
                     >
-                      Editar
+                      <MdEdit />
                     </button>
                     <button
                       onClick={() => openConfirmDeleteModal(category.id)}
-                      className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                      className="bg-red-500 text-white p-2 rounded-lg"
+                      aria-label="Deletar Categoria"
                     >
-                      Deletar
+                      <IoTrashBinSharp />
                     </button>
                   </div>
                 </div>
+
                 {category.subCategories.length > 0 && (
                   <ul className="mt-4 pl-4">
                     {category.subCategories.map((subCategory) => (
@@ -421,17 +437,20 @@ const CategoriesPage = () => {
                                 category.id // Passe a categoria pai aqui
                               )
                             }
-                            className="bg-yellow-500 text-white px-3 py-1 rounded-lg mx-2"
+                            className="bg-yellow-500 text-white p-2 rounded-lg mx-2"
+                            aria-label="Editar Subcategoria"
                           >
-                            Editar
+                            <BiEditAlt />
                           </button>
+
                           <button
                             onClick={() =>
                               openConfirmDeleteSubCategoryModal(subCategory.id)
                             }
-                            className="bg-red-500 text-white px-3 py-1 rounded-lg"
+                            className="bg-red-500 text-white p-2 rounded-lg"
+                            aria-label="Deletar Subcategoria"
                           >
-                            Deletar
+                            <FaTrash />
                           </button>
                         </div>
                       </li>
@@ -440,9 +459,9 @@ const CategoriesPage = () => {
                 )}
                 <button
                   onClick={() => openSubCategoryModal(category.id)}
-                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg"
+                  className="mt-2 bg-blue-500 text-white px-2 py-1 text-thin rounded-lg hover:bg-green-400 transition duration-1000 "
                 >
-                  Adicionar Subcategoria
+                  Nova Subcategoria
                 </button>
               </li>
             ))}
@@ -499,12 +518,16 @@ const CategoriesPage = () => {
       {showConfirmDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-xl font-bold mb-4">
               {subCategoryToDelete !== null
                 ? "Confirmar Exclusão de Subcategoria"
                 : "Confirmar Exclusão de Categoria"}
             </h2>
-            <p>
+            <p className="font-thin">
+              Lembre-se: para excluir uma Categoria, todas subcategorias devem
+              ser apagadas!
+            </p>
+            <p className="font-semi-bold text-red-500">
               Tem certeza que deseja excluir esta{" "}
               {subCategoryToDelete !== null ? "subcategoria" : "categoria"}?
             </p>
