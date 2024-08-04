@@ -67,7 +67,10 @@ const CategoriesPage = () => {
       }
     }
   };
+  //==================================================================
+  //********************************************** */
 
+  //==================================================================
   const handleCreateCategory = async () => {
     if (newCategoryName.trim() === "") return;
 
@@ -222,10 +225,19 @@ const CategoriesPage = () => {
     }
   };
   //=========================================================
-  const openConfirmDeleteModal = (id: number) => {
-    setCategoryToDelete(id);
-    setShowConfirmDeleteModal(true);
+  const openConfirmDeleteModal = (
+    id: number,
+    isSubCategory: boolean = false
+  ) => {
+    if (isSubCategory) {
+      setSubCategoryToDelete(id);
+      setShowConfirmDeleteModal(true);
+    } else {
+      setCategoryToDelete(id);
+      setShowConfirmDeleteModal(true);
+    }
   };
+
   //=========================================================
   const handleConfirmDelete = async () => {
     if (categoryToDelete === null) return;
@@ -275,19 +287,26 @@ const CategoriesPage = () => {
   };
 
   //=========================================================
+  // Função para abrir o modal de confirmação de exclusão da subcategoria
+  const openConfirmDeleteSubCategoryModal = (subCategoryId: number) => {
+    setSubCategoryToDelete(subCategoryId);
+    setShowConfirmDeleteModal(true);
+  };
+  //=========================================================
 
   const handleConfirmSubCategoryDelete = async () => {
     if (subCategoryToDelete === null) return;
 
     try {
       setLoading(true);
-      await api.delete("/subcategory", {
-        params: { id: subCategoryToDelete }, // Envia o ID da subcategoria
+      await api.delete(`/subcategory`, {
+        params: { id: subCategoryToDelete }, // Adiciona o ID como parâmetro
         headers: { Authorization: `Bearer ${manualToken}` },
       });
       fetchCategories();
       setSubCategoryToDelete(null);
-      setShowSubCategoryModal(false);
+      setShowSubCategoryModal(false); // Fecha o modal de subcategoria
+      setShowConfirmDeleteModal(false); // Fecha o modal de confirmação de exclusão
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         console.error(
@@ -302,6 +321,7 @@ const CategoriesPage = () => {
     }
   };
 
+  //=========================================================
   const handleCancelSubCategoryDelete = () => {
     setSubCategoryToDelete(null);
     setShowSubCategoryModal(false);
@@ -406,10 +426,9 @@ const CategoriesPage = () => {
                             Editar
                           </button>
                           <button
-                            onClick={() => {
-                              setSubCategoryToDelete(subCategory.id);
-                              setShowSubCategoryModal(true);
-                            }}
+                            onClick={() =>
+                              openConfirmDeleteSubCategoryModal(subCategory.id)
+                            }
                             className="bg-red-500 text-white px-3 py-1 rounded-lg"
                           >
                             Deletar
@@ -480,17 +499,32 @@ const CategoriesPage = () => {
       {showConfirmDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
-            <h2 className="text-xl font-semibold mb-4">Confirmar Exclusão</h2>
-            <p>Tem certeza que deseja excluir esta categoria?</p>
+            <h2 className="text-xl font-semibold mb-4">
+              {subCategoryToDelete !== null
+                ? "Confirmar Exclusão de Subcategoria"
+                : "Confirmar Exclusão de Categoria"}
+            </h2>
+            <p>
+              Tem certeza que deseja excluir esta{" "}
+              {subCategoryToDelete !== null ? "subcategoria" : "categoria"}?
+            </p>
             <div className="flex justify-end mt-4">
               <button
-                onClick={handleConfirmDelete}
+                onClick={
+                  subCategoryToDelete !== null
+                    ? handleConfirmSubCategoryDelete
+                    : handleConfirmDelete
+                }
                 className="bg-red-500 text-white px-4 py-2 rounded-lg mx-2"
               >
                 Deletar
               </button>
               <button
-                onClick={handleCancelDelete}
+                onClick={
+                  subCategoryToDelete !== null
+                    ? handleCancelSubCategoryDelete
+                    : handleCancelDelete
+                }
                 className="bg-gray-500 text-white px-4 py-2 rounded-lg"
               >
                 Cancelar
@@ -499,6 +533,7 @@ const CategoriesPage = () => {
           </div>
         </div>
       )}
+
       {/* ======================================================== */}
       {showSubCategoryModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
