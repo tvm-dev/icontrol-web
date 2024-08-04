@@ -1,4 +1,6 @@
 "use client";
+//================
+
 import { useEffect, useState } from "react";
 import { api } from "../services/api"; // Verifique se o caminho está correto
 import { manualToken, userID } from "../services/token"; // Verifique se o caminho está correto
@@ -119,6 +121,8 @@ const CategoriesPage = () => {
       fetchCategories();
       setEditCategoryId(null);
       setEditCategoryName("");
+      setShowModal(false);
+      fetchCategories();
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         console.error(
@@ -132,10 +136,17 @@ const CategoriesPage = () => {
       setLoading(false);
     }
   };
-
+  //==============================================
   const handleCreateSubCategory = async () => {
-    if (editSubCategoryName.trim() === "" || categoryForSubCategory === null)
+    if (editSubCategoryName.trim() === "" || categoryForSubCategory === null) {
       return;
+    }
+
+    console.log({
+      name: editSubCategoryName,
+      parentCategoryId: categoryForSubCategory,
+      userID: userID,
+    });
 
     try {
       setLoading(true);
@@ -143,15 +154,17 @@ const CategoriesPage = () => {
         "/subcategory",
         {
           name: editSubCategoryName,
-          categoryID: categoryForSubCategory,
+          parentCategoryId: categoryForSubCategory, // Use 'categoryId' aqui
+          //userID: userID, // Inclua o userID se for necessário para o backend
         },
         {
           headers: { Authorization: `Bearer ${manualToken}` },
         }
       );
-      fetchCategories();
-      setEditSubCategoryName("");
-      setShowSubCategoryModal(false);
+      fetchCategories(); // Atualiza a lista de categorias e subcategorias
+      setEditSubCategoryName(""); // Limpa o nome da subcategoria
+      setCategoryForSubCategory(null); // Limpa a categoria selecionada
+      setShowSubCategoryModal(false); // Fecha o modal de criação de subcategoria
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         console.error(
@@ -162,19 +175,30 @@ const CategoriesPage = () => {
         console.error("Erro desconhecido ao criar subcategoria:", error);
       }
     } finally {
-      setLoading(false);
+      setLoading(false); // Desativa o estado de carregamento
     }
   };
+
+  //==============================================
 
   const handleEditSubCategory = async () => {
     if (editSubCategoryId === null || editSubCategoryName.trim() === "") return;
 
+    console.log({
+      name: editSubCategoryName,
+      parentCategoryId: categoryForSubCategory,
+      userID: userID,
+    });
+
     try {
       setLoading(true);
       await api.put(
-        `/subcategory?id=${editSubCategoryId}`,
+        `/subcategory`, // Certifique-se de que o ID está correto
         {
+          id: editSubCategoryId,
           name: editSubCategoryName,
+          parentCategoryId: categoryForSubCategory,
+          //userID: userID,
         },
         {
           headers: { Authorization: `Bearer ${manualToken}` },
@@ -197,12 +221,12 @@ const CategoriesPage = () => {
       setLoading(false);
     }
   };
-
+  //=========================================================
   const openConfirmDeleteModal = (id: number) => {
     setCategoryToDelete(id);
     setShowConfirmDeleteModal(true);
   };
-
+  //=========================================================
   const handleConfirmDelete = async () => {
     if (categoryToDelete === null) return;
 
@@ -228,25 +252,29 @@ const CategoriesPage = () => {
       setLoading(false);
     }
   };
-
+  //=========================================================
   const handleCancelDelete = () => {
     setCategoryToDelete(null);
     setShowConfirmDeleteModal(false);
   };
-
+  //=========================================================
   const openSubCategoryModal = (categoryId: number) => {
     setCategoryForSubCategory(categoryId);
     setShowSubCategoryModal(true);
   };
-
+  //=========================================================
   const openEditSubCategoryModal = (
     subCategoryId: number,
-    subCategoryName: string
+    subCategoryName: string,
+    parentCategoryId: number
   ) => {
     setEditSubCategoryId(subCategoryId);
     setEditSubCategoryName(subCategoryName);
+    setCategoryForSubCategory(parentCategoryId); // Defina a categoria pai aqui
     setShowSubCategoryModal(true);
   };
+
+  //=========================================================
 
   const handleConfirmSubCategoryDelete = async () => {
     if (subCategoryToDelete === null) return;
@@ -254,7 +282,7 @@ const CategoriesPage = () => {
     try {
       setLoading(true);
       await api.delete("/subcategory", {
-        params: { id: subCategoryToDelete },
+        params: { id: subCategoryToDelete }, // Envia o ID da subcategoria
         headers: { Authorization: `Bearer ${manualToken}` },
       });
       fetchCategories();
@@ -286,7 +314,14 @@ const CategoriesPage = () => {
   return (
     <div className="p-4 text-center">
       <h1 className="text-3xl font-bold m-6">Categorias</h1>
-
+      <div className="mb-6">
+        <button
+          onClick={() => setShowModal(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+        >
+          Adicionar Categoria
+        </button>
+      </div>
       {/* Abas */}
       <div className="flex space-x-4 mb-6 text-center items-center justify-center">
         <button
@@ -320,73 +355,53 @@ const CategoriesPage = () => {
           Investimentos
         </button>
       </div>
-
-      <div className="mb-6">
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-        >
-          Adicionar Categoria
-        </button>
-      </div>
-
-      <div className="overflow-x-auto">
+      {/* Categorias */}
+      <div>
         {filteredCategories.length === 0 ? (
-          <p className="text-gray-500">Nenhuma categoria cadastrada.</p>
+          <p className="text-gray-500">Não há categorias cadastradas.</p>
         ) : (
-          filteredCategories.map((category) => (
-            <div
-              key={category.id}
-              className="border-b border-gray-300 pb-4 mb-4"
-            >
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">{category.name}</h2>
-                <div className="space-x-2">
-                  <button
-                    onClick={() => {
-                      setEditCategoryId(category.id);
-                      setEditCategoryName(category.name);
-                      setNewCategoryType(category.typeCategory);
-                      setShowModal(true);
-                    }}
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => openConfirmDeleteModal(category.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    Deletar
-                  </button>
-                  <button
-                    onClick={() => openSubCategoryModal(category.id)}
-                    className="text-green-500 hover:text-green-700"
-                  >
-                    Adicionar Subcategoria
-                  </button>
+          <ul className="space-y-4">
+            {filteredCategories.map((category) => (
+              <li key={category.id} className="border p-4 rounded-lg shadow-md">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold">{category.name}</h2>
+                  <div>
+                    <button
+                      onClick={() => {
+                        setEditCategoryId(category.id);
+                        setEditCategoryName(category.name);
+                        setShowModal(true);
+                      }}
+                      className="bg-green-500 text-white px-4 py-2 rounded-lg mx-2"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => openConfirmDeleteModal(category.id)}
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                    >
+                      Deletar
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-2">
-                {category.subCategories.length === 0 ? (
-                  <p className="text-gray-500">Nenhuma subcategoria.</p>
-                ) : (
-                  <ul>
+                {category.subCategories.length > 0 && (
+                  <ul className="mt-4 pl-4">
                     {category.subCategories.map((subCategory) => (
                       <li
                         key={subCategory.id}
-                        className="flex justify-between items-center"
+                        className="flex justify-between items-center border-b py-2"
                       >
                         <span>{subCategory.name}</span>
-                        <div className="space-x-2">
+                        <div>
                           <button
                             onClick={() =>
                               openEditSubCategoryModal(
                                 subCategory.id,
-                                subCategory.name
+                                subCategory.name,
+                                category.id // Passe a categoria pai aqui
                               )
                             }
-                            className="text-blue-500 hover:text-blue-700"
+                            className="bg-yellow-500 text-white px-3 py-1 rounded-lg mx-2"
                           >
                             Editar
                           </button>
@@ -395,7 +410,7 @@ const CategoriesPage = () => {
                               setSubCategoryToDelete(subCategory.id);
                               setShowSubCategoryModal(true);
                             }}
-                            className="text-red-500 hover:text-red-700"
+                            className="bg-red-500 text-white px-3 py-1 rounded-lg"
                           >
                             Deletar
                           </button>
@@ -404,47 +419,56 @@ const CategoriesPage = () => {
                     ))}
                   </ul>
                 )}
-              </div>
-            </div>
-          ))
+                <button
+                  onClick={() => openSubCategoryModal(category.id)}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg"
+                >
+                  Adicionar Subcategoria
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
-
-      {/* Modal Adicionar/Editar Categoria */}
+      {/* Modal de Criação de Categoria */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
+            <h2 className="text-xl font-semibold mb-4">
               {editCategoryId ? "Editar Categoria" : "Adicionar Categoria"}
             </h2>
             <input
               type="text"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
+              value={editCategoryId ? editCategoryName : newCategoryName}
+              onChange={(e) =>
+                editCategoryId
+                  ? setEditCategoryName(e.target.value)
+                  : setNewCategoryName(e.target.value)
+              }
+              className="border border-gray-300 p-2 w-full mb-4 rounded"
               placeholder="Nome da Categoria"
-              className="border border-gray-300 p-2 mb-4 w-full"
             />
             <select
               value={newCategoryType}
               onChange={(e) => setNewCategoryType(e.target.value)}
-              className="border border-gray-300 p-2 mb-4 w-full"
+              className="border border-gray-300 p-2 w-full mb-4 rounded"
             >
               <option value="expense">Despesa</option>
               <option value="income">Receita</option>
               <option value="investment">Investimento</option>
             </select>
-            <div className="flex space-x-2">
+            <div className="flex justify-end">
               <button
                 onClick={
                   editCategoryId ? handleEditCategory : handleCreateCategory
                 }
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg mx-2"
               >
                 {editCategoryId ? "Salvar" : "Adicionar"}
               </button>
               <button
                 onClick={() => setShowModal(false)}
-                className="bg-gray-300 px-4 py-2 rounded-lg"
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg"
               >
                 Cancelar
               </button>
@@ -452,23 +476,22 @@ const CategoriesPage = () => {
           </div>
         </div>
       )}
-
-      {/* Modal Confirmar Exclusão Categoria */}
+      {/* Modal de Confirmação de Exclusão de Categoria */}
       {showConfirmDeleteModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">Confirmar Exclusão</h2>
-            <p>Tem certeza de que deseja excluir esta categoria?</p>
-            <div className="flex space-x-2 mt-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
+            <h2 className="text-xl font-semibold mb-4">Confirmar Exclusão</h2>
+            <p>Tem certeza que deseja excluir esta categoria?</p>
+            <div className="flex justify-end mt-4">
               <button
                 onClick={handleConfirmDelete}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                className="bg-red-500 text-white px-4 py-2 rounded-lg mx-2"
               >
-                Confirmar
+                Deletar
               </button>
               <button
                 onClick={handleCancelDelete}
-                className="bg-gray-300 px-4 py-2 rounded-lg"
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg"
               >
                 Cancelar
               </button>
@@ -476,8 +499,7 @@ const CategoriesPage = () => {
           </div>
         </div>
       )}
-
-      {/* Modal Adicionar/Editar Subcategoria */}
+      {/* ======================================================== */}
       {showSubCategoryModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -493,6 +515,24 @@ const CategoriesPage = () => {
               placeholder="Nome da Subcategoria"
               className="border border-gray-300 p-2 mb-4 w-full"
             />
+            {editSubCategoryId && (
+              <select
+                value={categoryForSubCategory ?? ""}
+                onChange={(e) =>
+                  setCategoryForSubCategory(Number(e.target.value))
+                }
+                className="border border-gray-300 p-2 mb-4 w-full"
+              >
+                <option value="" disabled>
+                  Selecione a Categoria Pai
+                </option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            )}
             <div className="flex space-x-2">
               <button
                 onClick={
