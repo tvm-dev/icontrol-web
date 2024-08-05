@@ -181,16 +181,15 @@ export default function EditTransactionPage({
           name === "paid"
             ? value === "true"
             : name === "amount"
-            ? parseFloat(
-                value.replace("R$", "").replace(".", "").replace(",", ".")
-              )
+            ? value.replace(",", ".")
             : value,
       };
     });
   };
+  //======================================================
+  const formattedAmount = formData?.amount.toFixed(2).replace(".", ",") || "";
 
   //======================================================
-
   const handleEditTransaction = async (event: FormEvent) => {
     event.preventDefault();
 
