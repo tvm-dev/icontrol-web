@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { data } from "@/app/user/components/DropDownMenu/data";
 import { FaArrowAltCircleLeft } from "react-icons/fa";
+import { formatCurrencyBRL } from "@/app/utils/formatCurrencies";
 interface EditTransactionProps {
   id: number;
   description: string;
@@ -133,6 +134,7 @@ export default function EditTransactionPage({
   const statusRef = useRef<HTMLSelectElement | null>(null);
   const detailsRef = useRef<HTMLTextAreaElement | null>(null);
 
+  //======================================
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -148,6 +150,7 @@ export default function EditTransactionPage({
           paid: !!response.data.paid,
           type: response.data.type,
           category: response.data.category,
+          amount: formatCurrencyBRL(response.data.amount), // Formate o valor aqui
         });
 
         setSelectedType(response.data.type);
@@ -163,6 +166,7 @@ export default function EditTransactionPage({
     fetchData();
   }, [params.id]);
 
+  //======================================================
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -173,10 +177,19 @@ export default function EditTransactionPage({
 
       return {
         ...prevData,
-        [name]: name === "paid" ? value === "true" : value,
+        [name]:
+          name === "paid"
+            ? value === "true"
+            : name === "amount"
+            ? parseFloat(
+                value.replace("R$", "").replace(".", "").replace(",", ".")
+              )
+            : value,
       };
     });
   };
+
+  //======================================================
 
   const handleEditTransaction = async (event: FormEvent) => {
     event.preventDefault();
@@ -287,12 +300,12 @@ export default function EditTransactionPage({
 
           <div className="flex space-x-2">
             <div className="flex flex-col w-1/2">
-              <label className="text-xs">Valor:</label>
+              <label className="text-xs">Valor x:</label>
               <input
                 ref={amountRef}
-                type="number"
+                type="text"
                 name="amount"
-                value={formData.amount}
+                value={formattedAmount}
                 onChange={handleInputChange}
                 required
                 className="border border-1 mb-2 p-2 rounded"
