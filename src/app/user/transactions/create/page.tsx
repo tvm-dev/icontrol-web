@@ -32,6 +32,7 @@ export default function NewTransaction() {
   const [selectedType, setSelectedType] = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [categories, setCategories] = useState<string[]>([]);
+  const [amount, setAmount] = useState<string>("");
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const typeString = event.target.value;
@@ -53,12 +54,32 @@ export default function NewTransaction() {
     setSelectedCategory(event.target.value);
   };
 
+  //====================================================
+
+  const formatToBRL = (value: string) => {
+    value = value.replace(/\D/g, "");
+    value = (parseInt(value) / 100).toFixed(2) + "";
+    value = value.replace(".", ",");
+    value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+    return value;
+  };
+
+  const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let value = event.target.value;
+    value = value.replace(/\./g, "").replace(",", ".");
+    setAmount(formatToBRL(value));
+  };
+
   async function handleRegisterTransaction(event: FormEvent) {
     event.preventDefault();
 
+    const numericAmount = parseFloat(
+      amount.replace(/\./g, "").replace(",", ".")
+    );
+
     const transactionData = {
       description: descriptionRef.current?.value || "",
-      amount: parseFloat(amountRef.current?.value || "0"),
+      amount: numericAmount,
       date: dateRef.current?.value || "",
       payment: paymentRef.current?.value || "",
       details: detailsRef.current?.value || "",
@@ -74,7 +95,6 @@ export default function NewTransaction() {
       });
 
       if (response.status === 200) {
-        //alert("Transação Criada com Sucesso!");
         window.location.href = "/user/transactions";
       }
     } catch (error) {
@@ -109,12 +129,12 @@ export default function NewTransaction() {
 
   return (
     <>
-      <h1 className="font-bold text-2xl text-center text-blue-500 pt-20">
+      <h1 className="font-bold text-2xl text-center text-blue-500 pt-10">
         Nova Transação
       </h1>
-      <div className="mb-2 p-2 rounded flex justify-center">
+      <div className=" rounded flex justify-center">
         <form
-          className="flex flex-col w-full max-w-lg mx-4 my-2"
+          className="flex flex-col w-3/4 max-w-lg"
           onSubmit={handleRegisterTransaction}
         >
           {/* Description */}
@@ -123,19 +143,20 @@ export default function NewTransaction() {
             ref={descriptionRef}
             type="text"
             required
-            className="bg-blue-300 border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-blue-300 border border-1 w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <div className="flex items-center space-x-2">
             <div className="flex flex-col w-1/2">
               {/* Amount */}
-              <label className="text-xs">Valor:</label>
+              <label className="text-xs">Valor em R$:</label>
               <input
                 ref={amountRef}
-                defaultValue=""
-                type="number"
+                value={amount}
+                onChange={handleAmountChange}
+                type="text"
                 required
-                placeholder="R$"
+                placeholder="R$ 0,00"
                 className="bg-blue-300 border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -226,7 +247,7 @@ export default function NewTransaction() {
           {/* Button */}
           <input
             type="submit"
-            value="Salvar Transação"
+            value="Salvar"
             className="cursor-pointer w-full bg-blue-800 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-500"
           />
           <Link

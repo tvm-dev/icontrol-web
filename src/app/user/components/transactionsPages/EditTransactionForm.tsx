@@ -78,11 +78,12 @@ export default function EditTransaction({
     fetchData();
   }, [id]);
 
+  //========================================================
+
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-
     setFormData((prevData) => ({
       ...prevData,
       [name]: name === "paid" ? value === "true" : value,
@@ -218,13 +219,15 @@ export default function EditTransaction({
 
             <div className="flex flex-col w-1/2">
               <label className="text-xs">Status</label>
+
               <select
-                ref={statusRef}
-                className="border border-1 w-full mb-2 p-2 rounded"
-                defaultValue={formData.paid ? "1" : "2"} // Ajuste conforme o valor esperado
+                name="paid"
+                value={formData.paid.toString()} // Convert to string here
+                onChange={handleInputChange}
+                className="border border-1 mb-2 p-2 rounded w-full"
               >
-                <option value="1">Pago</option>
-                <option value="2">Pendente</option>
+                <option value="true">Pago</option>
+                <option value="false">Pendente</option>
               </select>
             </div>
           </div>

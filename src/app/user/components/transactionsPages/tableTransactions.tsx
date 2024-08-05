@@ -8,13 +8,13 @@ import {
   formatDateBr,
   parseDate,
 } from "@/app/utils/boniak/dateFilter";
+import { formatCurrentMonth } from "@/app/utils/boniak/dateFilter";
 import { formatCurrencyBRL } from "@/app/utils/formatCurrencies";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa"; // Importar ícones
 import { api } from "../../services/api";
 
 type TableTransactionsProps = {
   transactions: Transactions[];
-  filterType: string | null;
   updateTotals: (
     ve: number,
     vi: number,
@@ -22,6 +22,7 @@ type TableTransactionsProps = {
     fi: number,
     inv: number
   ) => void;
+  filterType: string | null;
 };
 
 const typeMapping: Record<number, string> = {
@@ -38,16 +39,14 @@ export default function TableTransactions({
   filterType,
 }: TableTransactionsProps) {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
-  const [filteredTransactions, setFilteredTransactions] = useState<
-    Transactions[]
-  >([]);
 
+  // ===============================================================================
   useEffect(() => {
     let filtered = filterTransactionsByMonth(transactions, currentMonth);
 
     if (filterType !== null) {
       filtered = filtered.filter(
-        (transaction) => transaction.type.toString() === filterType
+        (transaction) => transaction.type === filterType
       );
     }
 
@@ -87,10 +86,11 @@ export default function TableTransactions({
 
     // Chame updateTotals com todos os cinco parâmetros
     updateTotals(ve, vi, fe, fi, inv);
-    setFilteredTransactions(filtered);
   }, [transactions, currentMonth, updateTotals, filterType]);
 
-  if (!filteredTransactions || filteredTransactions.length === 0) {
+  // ===============================================================================
+
+  if (!transactions || transactions.length === 0) {
     return <p className="py-5 text-center">Nenhuma transação encontrada!</p>;
   }
 
@@ -101,17 +101,19 @@ export default function TableTransactions({
   ) => {
     try {
       // Chamada API para atualizar o status no backend
-      await api.put(`/transaction/${transactionId}`, {
+      await axios.put(`baseURL/transaction/${transactionId}`, {
         paid: !currentStatus,
       });
 
-      // Atualize o estado no frontend
-      const updatedTransactions = filteredTransactions.map((transaction) =>
+      // Atualize o estado no frontend (você pode optar por fazer um refetch das transações ou atualizar localmente)
+      // Para simplificação, assumiremos que o estado é atualizado localmente
+      const updatedTransactions = transactions.map((transaction) =>
         transaction.id === transactionId
           ? { ...transaction, paid: !currentStatus }
           : transaction
       );
-      setFilteredTransactions(updatedTransactions);
+      // Aqui, você deve atualizar o estado que mantém as transações (supondo que `transactions` seja um estado local ou vindo de props)
+      //updateTotals(updatedTransactions);
     } catch (error) {
       console.error("Erro ao atualizar o status da transação:", error);
     }
@@ -120,7 +122,7 @@ export default function TableTransactions({
   const transactionRows: JSX.Element[] = [];
   let currentHeader = "";
 
-  filteredTransactions.forEach((transaction) => {
+  transactions.forEach((transaction, index) => {
     const dateKey = formatDateBr(parseDate(transaction.date));
 
     if (dateKey !== currentHeader) {
@@ -173,6 +175,11 @@ export default function TableTransactions({
       </Link>
     );
   });
+
+  // console.log("Transações recebidas:", transactions);
+  // console.log("Tipo de filtro:", filterType);
+  // console.log("Data atual:", currentMonth);
+  // console.log("Tipo de filtro:", filterType);
 
   return (
     <div className="flex justify-center overflow-x-auto">
