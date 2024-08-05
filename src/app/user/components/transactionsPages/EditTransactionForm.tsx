@@ -45,7 +45,8 @@ export default function EditTransaction({
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<number>(0);
+
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   useEffect(() => {
@@ -97,12 +98,15 @@ export default function EditTransaction({
   const statusRef = useRef<HTMLSelectElement | null>(null);
   const detailsRef = useRef<HTMLInputElement | null>(null);
 
+  // ===
+
   const handleEditTransaction = async (event: FormEvent) => {
     event.preventDefault();
 
     setIsLoading(true);
 
     const transactionData = {
+      id, // Incluindo o ID no corpo da requisição
       description: descriptionRef.current?.value || "",
       amount: parseFloat(amountRef.current?.value || "0"),
       date: dateRef.current?.value || "",
@@ -110,12 +114,13 @@ export default function EditTransaction({
       payment: paymentRef.current?.value || "",
       category: categoryRef.current?.value || "",
       details: detailsRef.current?.value || "",
-      paid: formData.paid,
+      paid: statusRef.current?.value === "1", // Ajustando para boolean
     };
 
     try {
+      console.log("Dados da transação para atualização:", transactionData); // Adicione esta linha para depuração
+
       const response = await api.put(`/transaction`, transactionData, {
-        params: { id },
         headers: { Authorization: `Bearer ${manualToken}` },
       });
 
@@ -137,10 +142,14 @@ export default function EditTransaction({
     }
   };
 
+  // ===
+
+  //console.log("Dados da transação para atualização:", transactionData);
+
   return (
     <>
       <h1 className="font-bold text-2xl text-center text-blue-500 mt-2">
-        Alterando Transação...
+        Atualizar Transação...
       </h1>
       <div className="w-full mb-2 p-2 rounded">
         <form

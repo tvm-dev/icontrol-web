@@ -1,8 +1,6 @@
-// src/components/transactionsPages/TableTransactions.tsx
-//-----------
-
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import axios from "axios"; // Importar axios para chamadas de API
 import {
   Transactions,
   getCurrentMonth,
@@ -10,12 +8,13 @@ import {
   formatDateBr,
   parseDate,
 } from "@/app/utils/boniak/dateFilter";
-
-import { formatCurrentMonth } from "@/app/utils/boniak/dateFilter";
 import { formatCurrencyBRL } from "@/app/utils/formatCurrencies";
+import { FaThumbsUp, FaThumbsDown } from "react-icons/fa"; // Importar ícones
+import { api } from "../../services/api";
 
 type TableTransactionsProps = {
   transactions: Transactions[];
+  filterType: string | null;
   updateTotals: (
     ve: number,
     vi: number,
@@ -23,7 +22,6 @@ type TableTransactionsProps = {
     fi: number,
     inv: number
   ) => void;
-  filterType: string | null;
 };
 
 const typeMapping: Record<number, string> = {
@@ -40,13 +38,16 @@ export default function TableTransactions({
   filterType,
 }: TableTransactionsProps) {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
+  const [filteredTransactions, setFilteredTransactions] = useState<
+    Transactions[]
+  >([]);
 
   useEffect(() => {
     let filtered = filterTransactionsByMonth(transactions, currentMonth);
 
     if (filterType !== null) {
       filtered = filtered.filter(
-        (transaction) => transaction.type === filterType
+        (transaction) => transaction.type.toString() === filterType
       );
     }
 
@@ -84,24 +85,49 @@ export default function TableTransactions({
       }
     }
 
+    // Chame updateTotals com todos os cinco parâmetros
     updateTotals(ve, vi, fe, fi, inv);
+    setFilteredTransactions(filtered);
   }, [transactions, currentMonth, updateTotals, filterType]);
 
-  if (!transactions || transactions.length === 0) {
+  if (!filteredTransactions || filteredTransactions.length === 0) {
     return <p className="py-5 text-center">Nenhuma transação encontrada!</p>;
   }
+
+  // Função para alternar o estado de "paid"
+  const togglePaidStatus = async (
+    transactionId: number,
+    currentStatus: boolean
+  ) => {
+    try {
+      // Chamada API para atualizar o status no backend
+      await api.put(`/transaction/${transactionId}`, {
+        paid: !currentStatus,
+      });
+
+      // Atualize o estado no frontend
+      const updatedTransactions = filteredTransactions.map((transaction) =>
+        transaction.id === transactionId
+          ? { ...transaction, paid: !currentStatus }
+          : transaction
+      );
+      setFilteredTransactions(updatedTransactions);
+    } catch (error) {
+      console.error("Erro ao atualizar o status da transação:", error);
+    }
+  };
 
   const transactionRows: JSX.Element[] = [];
   let currentHeader = "";
 
-  transactions.forEach((transaction, index) => {
+  filteredTransactions.forEach((transaction) => {
     const dateKey = formatDateBr(parseDate(transaction.date));
 
     if (dateKey !== currentHeader) {
       transactionRows.push(
         <tr key={`header-${transaction.id}`} className="border-2 ">
           <td
-            colSpan={4}
+            colSpan={5} // Adicionar uma coluna extra para a mãozinha
             className="text-blue-500 text-center font-semibold p-2 text-sm border-l-2 align-middle"
           >
             📅 {dateKey}
@@ -124,6 +150,25 @@ export default function TableTransactions({
           <td className="p-2">{transaction.category}</td>
           <td className="p-2">{transaction.description}</td>
           <td className="p-2">{formatCurrencyBRL(transaction.amount)}</td>
+          <td className="p-2">
+            {transaction.paid ? (
+              <FaThumbsUp
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePaidStatus(transaction.id, transaction.paid);
+                }}
+                className="text-green-500 cursor-pointer"
+              />
+            ) : (
+              <FaThumbsDown
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePaidStatus(transaction.id, transaction.paid);
+                }}
+                className="text-red-500 cursor-pointer"
+              />
+            )}
+          </td>
         </tr>
       </Link>
     );

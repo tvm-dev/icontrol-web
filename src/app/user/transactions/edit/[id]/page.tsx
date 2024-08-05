@@ -3,10 +3,11 @@
 import { useEffect, useState, ChangeEvent, FormEvent, useRef } from "react";
 import axios from "axios";
 import { api } from "@/app/user/services/api";
-import { manualToken } from "@/app/user/services/token";
+import { manualToken, userID } from "@/app/user/services/token";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { data } from "@/app/user/components/DropDownMenu/data";
+import { FaArrowAltCircleLeft } from "react-icons/fa";
 interface EditTransactionProps {
   id: number;
   description: string;
@@ -153,7 +154,7 @@ export default function EditTransactionPage({
         setSelectedCategory(response.data.category);
       } catch (error) {
         console.error("Erro ao carregar transação:", error);
-        setError("Falha ao carregar a transação solicitada!");
+        setError("Falha ao carregar a transação solicitada x!");
       } finally {
         setIsLoading(false);
       }
@@ -180,9 +181,17 @@ export default function EditTransactionPage({
   const handleEditTransaction = async (event: FormEvent) => {
     event.preventDefault();
 
+    if (!formData) {
+      // Caso formData seja null, você pode definir um erro ou retornar
+      setError("Dados da transação não disponíveis.");
+      return;
+    }
+
     setIsLoading(true);
 
     const transactionData = {
+      //id: parseInt(params.id, 10), // Inclua o ID aqui
+      id: formData.id, // Adicione o id no corpo da requisição
       description: descriptionRef.current?.value || "",
       amount: parseFloat(amountRef.current?.value || "0"),
       date: dateRef.current?.value || "",
@@ -195,7 +204,7 @@ export default function EditTransactionPage({
 
     try {
       await api.put(`/transaction`, transactionData, {
-        params: { id: parseInt(params.id, 10) },
+        //params: { userID },
         headers: { Authorization: `Bearer ${manualToken}` },
       });
 
@@ -251,9 +260,15 @@ export default function EditTransactionPage({
 
   return (
     <>
-      <h1 className="font-bold text-2xl text-center text-blue-500 pt-20">
-        Alterando Transação...
-      </h1>
+      <div className="flex items-center mt-5 text-center justify-center ">
+        <Link href="/user/transactions" className="text-blue-500 p-2">
+          <FaArrowAltCircleLeft size={30} title="Voltar para as Transações" />
+        </Link>
+        <h1 className="font-bold text-2xl text-blue-500 ml-4">
+          Atualizando Transação...
+        </h1>
+      </div>
+
       <div className="mb-2 p-2 rounded flex justify-center">
         <form
           className="flex flex-col w-full max-w-lg mx-4 my-2"
@@ -335,7 +350,7 @@ export default function EditTransactionPage({
 
           <DependentDropdown
             selectedType={selectedType}
-            setSelectedType={setSelectedType}
+            setSelectedType={(type) => setSelectedType(Number(type))} // Converte para número
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
           />
@@ -361,9 +376,9 @@ export default function EditTransactionPage({
               type="button"
               onClick={handleDeleteTransaction}
               disabled={isLoading}
-              className="bg-transparent text-black border border-red-500 font-bold hover:bg-red-600 duration-1000 hover:text-white p-2 rounded w-1/2 text-center"
+              className="bg-transparent text-black border border-red-500 font-bold hover:bg-red-600 duration-1000 hover:text-white p-2 rounded w-1/3 text-center"
             >
-              {isLoading ? "Excluindo..." : "Apagar Transação"}
+              {isLoading ? "Excluindo..." : "Apagar"}
             </button>
           </div>
 

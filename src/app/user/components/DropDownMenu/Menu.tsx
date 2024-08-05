@@ -18,13 +18,13 @@ const reverseTypeMapping: { [key: number]: string } = Object.fromEntries(
 );
 
 interface DependentDropdownProps {
-  selectedType: number; // Atualizado para número
-  setSelectedType: (type: number) => void; // Atualizado para número
+  selectedType: number;
+  setSelectedType: (type: number) => void;
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
 }
 
-const DependentDropdown = ({
+const DependentDropdown: React.FC<DependentDropdownProps> = ({
   selectedType,
   setSelectedType,
   selectedCategory,
@@ -48,7 +48,7 @@ const DependentDropdown = ({
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const typeString = event.target.value;
     const typeNumber = typeMapping[typeString as keyof typeof typeMapping];
-    setSelectedType(typeNumber);
+    setSelectedType(Number(event.target.value)); // Converte a string para número
 
     // Atualiza categorias ao selecionar um novo tipo
     const typeData = data.transactionsType.find((t) => t.type === typeString);

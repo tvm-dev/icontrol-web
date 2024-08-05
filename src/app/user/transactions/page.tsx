@@ -122,6 +122,20 @@ export default function PageTransactions() {
       )
     : transactionFiltered;
 
+  const handleUpdateTotals = (
+    ve: number,
+    vi: number,
+    fe: number,
+    fi: number,
+    inv: number
+  ) => {
+    setVariableExpenses(ve);
+    setVariableIncomes(vi);
+    setFixedExpenses(fe);
+    setFixedIncomes(fi);
+    setInvestments(inv);
+  };
+
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-4">
       <AreaMonth
@@ -139,7 +153,7 @@ export default function PageTransactions() {
       <TableTransactions
         transactions={filteredTransactions}
         filterType={filterType}
-        updateTotals={() => calculateTotals(transactionFiltered)}
+        updateTotals={handleUpdateTotals}
       />
     </div>
   );

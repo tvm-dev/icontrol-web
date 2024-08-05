@@ -230,7 +230,7 @@ export default function NewTransaction() {
             className="cursor-pointer w-full bg-blue-800 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-500"
           />
           <Link
-            href="/transactions"
+            href="/user/transactions"
             className="text-blue-500 text-center mt-10 border-b-2"
           >
             Voltar para todas as transações
