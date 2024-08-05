@@ -11,6 +11,12 @@ import {
 } from "@/app/utils/boniak/dateFilter";
 import { api } from "../services/api";
 import { manualToken } from "../services/token";
+import Head from "next/head";
+//import { Metadata } from "next";
+
+// export const metadata: Metadata = {
+//   title: "Transações",
+// };
 
 export default function PageTransactions() {
   const [currentMonth, setCurrentMonth] = useState<string>(getCurrentMonth());
@@ -137,24 +143,31 @@ export default function PageTransactions() {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-4">
-      <AreaMonth
-        currentMonth={currentMonth}
-        onMonthChange={handleMonthChange}
-      />
-      <AreaBalanceMonth
-        ve={variableExpenses}
-        vi={variableIncomes}
-        fe={fixedExpenses}
-        fi={fixedIncomes}
-        inv={investments}
-      />
-      <AreaFilter onFilterChange={handleFilterChange} />
-      <TableTransactions
-        transactions={filteredTransactions}
-        filterType={filterType}
-        updateTotals={handleUpdateTotals}
-      />
-    </div>
+    <>
+      <Head>
+        <title>Meu Título Global</title>
+        <meta name="description" content="Descrição global da aplicação" />
+      </Head>
+
+      <div className="p-4 md:p-6 lg:p-8 space-y-4">
+        <AreaMonth
+          currentMonth={currentMonth}
+          onMonthChange={handleMonthChange}
+        />
+        <AreaBalanceMonth
+          ve={variableExpenses}
+          vi={variableIncomes}
+          fe={fixedExpenses}
+          fi={fixedIncomes}
+          inv={investments}
+        />
+        <AreaFilter onFilterChange={handleFilterChange} />
+        <TableTransactions
+          transactions={filteredTransactions}
+          filterType={filterType}
+          updateTotals={handleUpdateTotals}
+        />
+      </div>
+    </>
   );
 }

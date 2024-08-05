@@ -2,8 +2,18 @@
 import React, { useState } from "react";
 import Header from "./components/Shared/Header";
 import Sidebar from "./components/Shared/Sidebar";
-import Footer from "./components/Shared/Footer";
 import FloatingButton from "./components/Shared/FloatingButton";
+//import { Metadata } from "next";
+
+import Head from "next/head";
+
+// export const metadata: Metadata = {
+//   title: {
+//     absolute: "",
+//     default: "iControl - Default",
+//     template: " %s | iControl: pq vc controla sua grana!",
+//   },
+// };
 
 const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -13,26 +23,33 @@ const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      {/* Header */}
-      <Header onToggleSidebar={toggleSidebar} />
+    <>
+      <Head>
+        <title>Meu Título Global</title>
+        <meta name="description" content="Descrição global da aplicação" />
+      </Head>
 
-      <div className="flex flex-1 pt-16 md:pt-10">
-        {" "}
-        {/* Ajuste para evitar sobreposição */}
-        {/* Sidebar */}
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        {/* Content Area */}
-        <main className="flex-1 overflow-y-auto md:ml-64 bg-slate-100 ">
-          {children}
-        </main>
+      <div className="flex flex-col h-screen">
+        {/* Header */}
+        <Header onToggleSidebar={toggleSidebar} />
+
+        <div className="flex flex-1 pt-16 md:pt-10">
+          {" "}
+          {/* Ajuste para evitar sobreposição */}
+          {/* Sidebar */}
+          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          {/* Content Area */}
+          <main className="flex-1 overflow-y-auto md:ml-64 bg-slate-100 ">
+            {children}
+          </main>
+        </div>
+        {/* Floating Button */}
+        <FloatingButton />
+
+        {/* Footer */}
+        {/* <Footer /> */}
       </div>
-      {/* Floating Button */}
-      <FloatingButton />
-
-      {/* Footer */}
-      {/* <Footer /> */}
-    </div>
+    </>
   );
 };
 
