@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState, ChangeEvent, FormEvent, useRef } from "react";
+import { useEffect, useState, FormEvent, useRef } from "react";
 import axios from "axios";
 import { api } from "@/app/user/services/api";
-import { manualToken, userID } from "@/app/user/services/token";
+import { manualToken } from "@/app/user/services/token";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { data } from "@/app/user/components/DropDownMenu/data";
 import { FaArrowAltCircleLeft } from "react-icons/fa";
-import { formatCurrencyBRL } from "@/app/utils/formatCurrencies";
+
 interface EditTransactionProps {
   id: number;
   description: string;
@@ -61,13 +61,6 @@ const DependentDropdown = ({
     const typeString = event.target.value;
     const typeNumber = typeMapping[typeString as keyof typeof typeMapping];
     setSelectedType(typeNumber);
-
-    const typeData = data.transactionsType.find((t) => t.type === typeString);
-    if (typeData) {
-      setCategories(typeData.categories);
-    } else {
-      setCategories([]);
-    }
   };
 
   const handleCategoryChange = (
@@ -124,17 +117,32 @@ export default function EditTransactionPage({
   const [error, setError] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [amountInput, setAmountInput] = useState("");
 
   const router = useRouter();
 
-  const descriptionRef = useRef<HTMLInputElement | null>(null);
-  const amountRef = useRef<HTMLInputElement | null>(null);
-  const dateRef = useRef<HTMLInputElement | null>(null);
-  const paymentRef = useRef<HTMLSelectElement | null>(null);
-  const statusRef = useRef<HTMLSelectElement | null>(null);
-  const detailsRef = useRef<HTMLTextAreaElement | null>(null);
+  const descriptionRef = useRef<HTMLInputElement>(null);
+  const amountRef = useRef<HTMLInputElement>(null);
+  const dateRef = useRef<HTMLInputElement>(null);
+  const paymentRef = useRef<HTMLSelectElement>(null);
+  const statusRef = useRef<HTMLSelectElement>(null);
+  const detailsRef = useRef<HTMLTextAreaElement>(null);
+  //==============================================================
+  const formatToBRL = (amount: number): string => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
 
-  //======================================
+  const parseBRLToNumber = (value: string): number => {
+    const numericValue = value.replace(/[^\d,-]/g, "").replace(",", ".");
+    return parseFloat(numericValue) || 0;
+  };
+  //==============================================================
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -145,19 +153,17 @@ export default function EditTransactionPage({
           headers: { Authorization: `Bearer ${manualToken}` },
         });
 
-        setFormData({
+        const transactionData = {
           ...response.data,
           paid: !!response.data.paid,
-          type: response.data.type,
-          category: response.data.category,
-          amount: formatCurrencyBRL(response.data.amount), // Formate o valor aqui
-        });
+          amount: parseFloat(response.data.amount) || 0,
+        };
 
-        setSelectedType(response.data.type);
-        setSelectedCategory(response.data.category);
+        setFormData(transactionData);
+        setAmountInput(formatToBRL(transactionData.amount));
       } catch (error) {
         console.error("Erro ao carregar transação:", error);
-        setError("Falha ao carregar a transação solicitada x!");
+        setError("Falha ao carregar a transação solicitada!");
       } finally {
         setIsLoading(false);
       }
@@ -166,35 +172,41 @@ export default function EditTransactionPage({
     fetchData();
   }, [params.id]);
 
-  //======================================================
+  //==============================================================
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    event: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
-    const { name, value } = e.target;
+    const { name, value } = event.target;
 
-    setFormData((prevData) => {
-      if (!prevData) return null;
+    if (!formData) return;
 
-      return {
-        ...prevData,
-        [name]:
-          name === "paid"
-            ? value === "true"
-            : name === "amount"
-            ? value.replace(",", ".")
-            : value,
-      };
-    });
+    if (name === "amount") {
+      setAmountInput(value);
+      const numericValue = parseBRLToNumber(value);
+      setFormData((prev) => ({ ...prev!, amount: numericValue }));
+    } else {
+      setFormData((prev) => ({
+        ...prev!,
+        [name]: name === "paid" ? value === "true" : value,
+      }));
+    }
   };
-  //======================================================
-  const formattedAmount = formData?.amount.toFixed(2).replace(".", ",") || "";
 
-  //======================================================
+  //==============================================================
+  const handleAmountBlur = () => {
+    if (formData) {
+      setAmountInput(formatToBRL(formData.amount));
+    }
+  };
+
+  //==============================================================
+
   const handleEditTransaction = async (event: FormEvent) => {
     event.preventDefault();
 
     if (!formData) {
-      // Caso formData seja null, você pode definir um erro ou retornar
       setError("Dados da transação não disponíveis.");
       return;
     }
@@ -202,21 +214,13 @@ export default function EditTransactionPage({
     setIsLoading(true);
 
     const transactionData = {
-      //id: parseInt(params.id, 10), // Inclua o ID aqui
-      id: formData.id, // Adicione o id no corpo da requisição
-      description: descriptionRef.current?.value || "",
-      amount: parseFloat(amountRef.current?.value || "0"),
-      date: dateRef.current?.value || "",
+      ...formData,
       type: selectedType,
-      payment: paymentRef.current?.value || "",
       category: selectedCategory,
-      details: detailsRef.current?.value || "",
-      paid: formData?.paid || false,
     };
 
     try {
       await api.put(`/transaction`, transactionData, {
-        //params: { userID },
         headers: { Authorization: `Bearer ${manualToken}` },
       });
 
@@ -265,10 +269,13 @@ export default function EditTransactionPage({
     }
   };
 
+  // ====================
+
   if (isLoading) return <p>Carregando...</p>;
   if (error) return <p className="text-red-500 text-center">{error}</p>;
   if (!formData)
     return <p className="text-center">Transação não encontrada!</p>;
+  // ====================
 
   return (
     <>
@@ -299,13 +306,16 @@ export default function EditTransactionPage({
 
           <div className="flex space-x-2">
             <div className="flex flex-col w-1/2">
-              <label className="text-xs">Valor x:</label>
+              <label className="text-xs">Valor:</label>
               <input
                 ref={amountRef}
                 type="text"
                 name="amount"
-                value={formattedAmount}
+                //value={formatToBRL(formData.amount)}
+                value={amountInput}
+                //onChange={handleInputChange}
                 onChange={handleInputChange}
+                onBlur={handleAmountBlur}
                 required
                 className="border border-1 mb-2 p-2 rounded"
               />
@@ -362,7 +372,7 @@ export default function EditTransactionPage({
 
           <DependentDropdown
             selectedType={selectedType}
-            setSelectedType={(type) => setSelectedType(Number(type))} // Converte para número
+            setSelectedType={setSelectedType}
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
           />
@@ -398,7 +408,7 @@ export default function EditTransactionPage({
             href="/user/transactions"
             className="text-blue-500 text-center mt-10 border-b-2"
           >
-            Voltar para todas as transações
+            Todas Transações
           </Link>
         </form>
       </div>

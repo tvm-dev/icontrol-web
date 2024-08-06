@@ -19,7 +19,7 @@ interface EditTransactionProps {
   paid: boolean;
 }
 
-export default function EditTransaction({
+export default function EditTransactionForm({
   id,
   description,
   amount,
@@ -142,10 +142,6 @@ export default function EditTransaction({
       setIsLoading(false);
     }
   };
-
-  // ===
-
-  //console.log("Dados da transação para atualização:", transactionData);
 
   return (
     <>
