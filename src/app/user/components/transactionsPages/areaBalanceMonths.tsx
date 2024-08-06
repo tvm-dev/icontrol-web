@@ -10,12 +10,12 @@ type Props = {
 
 export const AreaBalanceMonth = ({ ve, vi, fe, fi, inv }: Props) => {
   return (
-    <div className=" rounded-lg shadow-md">
+    <div className="">
       <div className="text-center text-lg font-semibold mb-2">
         Balanço deste mês
       </div>
 
-      <div className="flex gap-2 justify-center pys-2">
+      <div className="flex gap-2 justify-center">
         <div className="bg-blue-500 p-2 rounded-lg text-white min-w-[100px] text-center">
           <p>Saldo</p>
           <p className="font-bold">

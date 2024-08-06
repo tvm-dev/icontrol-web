@@ -77,7 +77,7 @@ export const formatDateBr = (date: Date): string => {
   
   // Função auxiliar para obter o nome do dia da semana
   const getWeekdayName = (dayOfWeek: number): string => {
-    const weekdays = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+    const weekdays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
     return weekdays[dayOfWeek];
   }
   

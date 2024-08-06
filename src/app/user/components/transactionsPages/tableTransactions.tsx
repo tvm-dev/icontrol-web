@@ -130,7 +130,7 @@ export default function TableTransactions({
         <tr key={`header-${transaction.id}`} className="border-2 ">
           <td
             colSpan={5} // Adicionar uma coluna extra para a mãozinha
-            className="text-blue-500 text-center font-semibold p-2 text-sm border-l-2 align-middle"
+            className="text-red-600 text-center text-sm"
           >
             📅 {dateKey}
           </td>
