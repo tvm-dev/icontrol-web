@@ -11,12 +11,6 @@ import {
 } from "@/app/utils/boniak/dateFilter";
 import { api } from "../services/api";
 import { manualToken } from "../services/token";
-import Head from "next/head";
-//import { Metadata } from "next";
-
-// export const metadata: Metadata = {
-//   title: "Transações",
-// };
 
 export default function PageTransactions() {
   const [currentMonth, setCurrentMonth] = useState<string>(getCurrentMonth());
@@ -74,6 +68,7 @@ export default function PageTransactions() {
           headers: { Authorization: `Bearer ${manualToken}` },
         });
         setTransactions(response.data);
+        //console.log(response.data);
       } catch (error) {
         console.error("Erro ao carregar transações:", error);
       }
@@ -95,24 +90,24 @@ export default function PageTransactions() {
     }
   }, [transactionFiltered]);
 
-  const handleDelete = async (id: number) => {
-    const isConfirmed = window.confirm(
-      "Você realmente quer apagar esta transação? Não será mais possível recuperá-la!"
-    );
-    if (!isConfirmed) return;
+  // const handleDelete = async (id: number) => {
+  //   const isConfirmed = window.confirm(
+  //     "Você realmente quer apagarXXX esta transação? Não será mais possível recuperá-la!"
+  //   );
+  //   if (!isConfirmed) return;
 
-    try {
-      await api.delete("/transaction", {
-        params: { id: id },
-        headers: { Authorization: `Bearer ${manualToken}` },
-      });
-      setTransactions(
-        transactions.filter((transaction) => transaction.id !== id)
-      );
-    } catch (error) {
-      console.error("Erro ao deletar transação:", error);
-    }
-  };
+  //   try {
+  //     await api.delete("/transaction", {
+  //       params: { id: id },
+  //       headers: { Authorization: `Bearer ${manualToken}` },
+  //     });
+  //     setTransactions(
+  //       transactions.filter((transaction) => transaction.id !== id)
+  //     );
+  //   } catch (error) {
+  //     console.error("Erro ao deletar transação:", error);
+  //   }
+  // };
 
   const handleMonthChange = (newMonth: string) => {
     setCurrentMonth(newMonth);
@@ -144,11 +139,6 @@ export default function PageTransactions() {
 
   return (
     <>
-      <Head>
-        <title>Meu Título Global</title>
-        <meta name="description" content="Descrição global da aplicação" />
-      </Head>
-
       <div className="p-4 md:p-6 lg:p-8 space-y-4">
         <AreaMonth
           currentMonth={currentMonth}

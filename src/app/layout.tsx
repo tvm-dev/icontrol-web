@@ -3,18 +3,16 @@ import React from "react";
 import "./globals.css"; // Inclua seu CSS global aqui
 import { Metadata } from "next";
 
-// export const metadata = {
-//   title: "iControl: onde vc controla sua Grana!",
-//   description: "Descrição do seu site",
-// };
-
 export const metadata: Metadata = {
   title: {
     absolute: "",
     default: "iControl: onde vc controla sua Grana! ",
     template: "%s | iControl: onde vc controla sua Grana!",
   },
-  description: "Descrição do seu site",
+  description: "Controlando sua grana AGORA MESMO!",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {

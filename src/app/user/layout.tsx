@@ -3,17 +3,6 @@ import React, { useState } from "react";
 import Header from "./components/Shared/Header";
 import Sidebar from "./components/Shared/Sidebar";
 import FloatingButton from "./components/Shared/FloatingButton";
-//import { Metadata } from "next";
-
-import Head from "next/head";
-
-// export const metadata: Metadata = {
-//   title: {
-//     absolute: "",
-//     default: "iControl - Default",
-//     template: " %s | iControl: pq vc controla sua grana!",
-//   },
-// };
 
 const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -24,11 +13,6 @@ const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <>
-      <Head>
-        <title>Meu Título Global</title>
-        <meta name="description" content="Descrição global da aplicação" />
-      </Head>
-
       <div className="flex flex-col h-screen">
         {/* Header */}
         <Header onToggleSidebar={toggleSidebar} />

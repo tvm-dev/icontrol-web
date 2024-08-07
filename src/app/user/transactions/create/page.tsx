@@ -6,14 +6,13 @@ import axios from "axios";
 import { FormEvent, useRef, useEffect, useState } from "react";
 import { data } from "../../components/DropDownMenu/data";
 import Link from "next/link";
+import { FaThumbsUp, FaThumbsDown } from "react-icons/fa"; // Importar ícones
 
 // Mapeamento dos tipos para seus valores numéricos
 const typeMapping: { [key: string]: number } = {
-  "Despesa Variável": 1,
-  "Receita Variável": 2,
-  "Despesa Fixa": 3,
-  "Receita Fixa": 4,
-  Investimentos: 5,
+  Despesa: 1,
+  Receita: 2,
+  Investimento: 3,
 };
 
 // Mapeamento reverso para converter número em string
@@ -27,18 +26,17 @@ export default function NewTransaction() {
   const dateRef = useRef<HTMLInputElement | null>(null);
   const paymentRef = useRef<HTMLSelectElement | null>(null);
   const detailsRef = useRef<HTMLInputElement | null>(null);
-  const statusRef = useRef<HTMLSelectElement | null>(null);
 
-  const [selectedType, setSelectedType] = useState<number>(0);
+  const [selectedType, setSelectedType] = useState<number>(1);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [categories, setCategories] = useState<string[]>([]);
   const [amount, setAmount] = useState<string>("");
+  const [isPaid, setIsPaid] = useState<boolean>(true);
 
-  const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const typeString = event.target.value;
-    const typeNumber = typeMapping[typeString as keyof typeof typeMapping];
+  const handleTypeChange = (typeNumber: number) => {
     setSelectedType(typeNumber);
 
+    const typeString = reverseTypeMapping[typeNumber];
     const typeData = data.transactionsType.find((t) => t.type === typeString);
     if (typeData) {
       setCategories(typeData.categories);
@@ -53,8 +51,6 @@ export default function NewTransaction() {
   ) => {
     setSelectedCategory(event.target.value);
   };
-
-  //====================================================
 
   const formatToBRL = (value: string) => {
     value = value.replace(/\D/g, "");
@@ -83,7 +79,7 @@ export default function NewTransaction() {
       date: dateRef.current?.value || "",
       payment: paymentRef.current?.value || "",
       details: detailsRef.current?.value || "",
-      paid: statusRef.current?.value === "1",
+      paid: isPaid,
       type: selectedType,
       category: selectedCategory,
     };
@@ -116,7 +112,6 @@ export default function NewTransaction() {
       dateRef.current,
       paymentRef.current,
       detailsRef.current,
-      statusRef.current,
     ];
 
     elements.forEach((el) => {
@@ -132,11 +127,28 @@ export default function NewTransaction() {
       <h1 className="font-bold text-2xl text-center text-blue-500 pt-10">
         Nova Transação
       </h1>
-      <div className=" rounded flex justify-center">
+      <div className="rounded flex justify-center">
         <form
           className="flex flex-col w-3/4 max-w-lg"
           onSubmit={handleRegisterTransaction}
         >
+          <div className="flex justify-center mb-4">
+            {Object.entries(typeMapping).map(([key, value]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => handleTypeChange(value)}
+                className={`px-4 py-2 mx-1 ${
+                  selectedType === value
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-300"
+                } rounded`}
+              >
+                {key}
+              </button>
+            ))}
+          </div>
+
           {/* Description */}
           <label className="text-xs">Descrição:</label>
           <input
@@ -170,28 +182,26 @@ export default function NewTransaction() {
                 className="bg-blue-300 border border-1 w-full mb-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
+            <div className="flex items-center space-x-2 mb-2">
+              {isPaid ? (
+                <FaThumbsUp
+                  className="text-green-500 cursor-pointer"
+                  onClick={() => setIsPaid(false)}
+                />
+              ) : (
+                <FaThumbsDown
+                  className="text-red-500 cursor-pointer"
+                  onClick={() => setIsPaid(true)}
+                />
+              )}
+            </div>
           </div>
 
-          {/* Tipo e Categoria */}
+          {/* Conta: inicial ou crédito  */}
           <div className="flex items-center space-x-2">
             <div className="flex flex-col w-1/2">
-              <label className="text-xs">Tipo:</label>
-              <select
-                value={reverseTypeMapping[selectedType] || ""}
-                onChange={handleTypeChange}
-                className="bg-blue-300 border border-1 mb-2 p-2 rounded w-full"
-              >
-                <option value="">Selecione</option>
-                {Object.keys(typeMapping).map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col w-1/2">
-              <label className="text-xs">Categoria:</label>
+              <label className="text-xs">Conta/Cartão:</label>
               <select
                 value={selectedCategory}
                 onChange={handleCategoryChange}
@@ -206,32 +216,13 @@ export default function NewTransaction() {
                 ))}
               </select>
             </div>
-          </div>
-
-          {/* Payment and Status */}
-          <div className="flex items-center space-x-2">
             <div className="flex flex-col w-1/2">
-              <label className="text-xs">Pago com:</label>
+              <label className="text-xs">Categoria:</label>
               <select
                 ref={paymentRef}
                 className="bg-blue-300 border border-1 mb-2 p-2 rounded w-full"
               >
-                <option value="1">Débito</option>
-                <option value="2">Crédito</option>
-                <option value="3">Pix</option>
-                <option value="4">Dinheiro</option>
                 <option value="5">Outros</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col w-1/2">
-              <label className="text-xs">Status</label>
-              <select
-                ref={statusRef}
-                className="bg-blue-300 border border-1 w-full mb-2 p-2 rounded"
-              >
-                <option value="1">Pago</option>
-                <option value="2">Pendente</option>
               </select>
             </div>
           </div>
@@ -250,12 +241,9 @@ export default function NewTransaction() {
             value="Salvar"
             className="cursor-pointer w-full bg-blue-800 rounded font-bold p-3 text-white hover:bg-blue-900 transition duration-500"
           />
-          <Link
-            href="/user/transactions"
-            className="text-blue-500 text-center mt-10 border-b-2"
-          >
-            Voltar para todas as transações
-          </Link>
+          <div className="mt-5 flex justify-between text-blue-800">
+            <Link href="/user/transactions">Cancelar</Link>
+          </div>
         </form>
       </div>
     </>
