@@ -90,3 +90,14 @@ export const formatDateBr = (date: Date): string => {
     // O mês em JavaScript é baseado em zero, então subtraímos 1
     return new Date(Date.UTC(year, month - 1, day));
 };
+
+//Loading data in modal form new transaction:
+export const getCurrentDate = (): string => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // Adiciona zero à esquerda se necessário
+    const day = now.getDate().toString().padStart(2, '0'); // Adiciona zero à esquerda se necessário
+    return `${year}-${month}-${day}`;
+};
+
+

@@ -4,6 +4,7 @@ import { manualToken, userID } from "../../services/token";
 import axios from "axios";
 import { FormEvent, useRef, useEffect, useState } from "react";
 import { FaThumbsUp, FaThumbsDown, FaWindowClose } from "react-icons/fa";
+import { getCurrentDate } from "@/app/utils/boniak/dateFilter";
 
 const typeMapping: { [key: string]: number } = {
   Despesa: 1,
@@ -39,6 +40,7 @@ export default function NewTransactionModal({
   const [isPaid, setIsPaid] = useState<boolean>(true);
   const [isRecurrent, setIsRecurrent] = useState<boolean>(false);
   const [recurrenceType, setRecurrenceType] = useState<string>("");
+  //===============================================ok
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,7 +64,13 @@ export default function NewTransactionModal({
 
     fetchData();
   }, []);
-
+  //===============================================ok
+  useEffect(() => {
+    if (dateRef.current) {
+      dateRef.current.value = getCurrentDate(); // Define a data atual
+    }
+  }, []);
+  //=================================================
   const handleTypeChange = (typeNumber: number) => {
     setSelectedType(typeNumber);
     setSelectedCategory("");
@@ -217,14 +225,15 @@ export default function NewTransactionModal({
               {isPaid ? (
                 <FaThumbsUp
                   className="text-green-500 cursor-pointer"
-                  onClick={() => setIsPaid(false)}
+                  onClick={() => setIsPaid(!isPaid)}
                 />
               ) : (
                 <FaThumbsDown
                   className="text-red-500 cursor-pointer"
-                  onClick={() => setIsPaid(true)}
+                  onClick={() => setIsPaid(!isPaid)}
                 />
               )}
+              <span className="text-xs">Pago</span>
             </div>
           </div>
 
