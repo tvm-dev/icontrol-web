@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import NewTransactionButton from "../NewTransactionButton";
 
 interface HeaderProps {
   onToggleSidebar: () => void;

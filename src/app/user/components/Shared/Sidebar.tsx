@@ -8,6 +8,7 @@ import {
   CurrencyDollarIcon,
   BanknotesIcon,
 } from "@heroicons/react/24/outline";
+import NewTransactionButton from "../NewTransactionButton";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -133,6 +134,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </a>
               </li>
             </ul>
+
+            <div className="ml-10">
+              <NewTransactionButton />
+            </div>
           </nav>
         </div>
         <div className="flex flex-col justify-between p-4">

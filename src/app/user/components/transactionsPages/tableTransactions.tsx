@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import axios from "axios"; // Importar axios para chamadas de API
+import axios from "axios";
 import {
   Transactions,
   getCurrentMonth,
@@ -8,10 +8,8 @@ import {
   formatDateBr,
   parseDate,
 } from "@/app/utils/boniak/dateFilter";
-import { formatCurrentMonth } from "@/app/utils/boniak/dateFilter";
 import { formatCurrencyBRL } from "@/app/utils/formatCurrencies";
-import { FaThumbsUp, FaThumbsDown } from "react-icons/fa"; // Importar ícones
-import { api } from "../../services/api";
+import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 type TableTransactionsProps = {
   transactions: Transactions[];
@@ -30,7 +28,7 @@ const typeMapping: Record<number, string> = {
   2: "😍 RV",
   3: "😿 DF",
   4: "🤑 RF",
-  5: "💹 In",
+  5: "💹 Inv",
 };
 
 export default function TableTransactions({
@@ -40,22 +38,19 @@ export default function TableTransactions({
 }: TableTransactionsProps) {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
 
-  // ===============================================================================
   useEffect(() => {
     let filtered = filterTransactionsByMonth(transactions, currentMonth);
 
     if (filterType !== null) {
       filtered = filtered.filter(
-        (transaction) => transaction.type === filterType
+        (transaction) => transaction.transactionType === filterType
       );
     }
 
-    // Ordenar transações por data decrescente
     filtered.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
-    // Calcular totais para todas as transações filtradas
     let ve = 0;
     let vi = 0;
     let fe = 0;
@@ -63,7 +58,7 @@ export default function TableTransactions({
     let inv = 0;
 
     for (let transaction of filtered) {
-      switch (parseInt(transaction.type)) {
+      switch (parseInt(transaction.transactionType)) {
         case 1:
           ve += transaction.amount;
           break;
@@ -84,36 +79,28 @@ export default function TableTransactions({
       }
     }
 
-    // Chame updateTotals com todos os cinco parâmetros
     updateTotals(ve, vi, fe, fi, inv);
   }, [transactions, currentMonth, updateTotals, filterType]);
-
-  // ===============================================================================
 
   if (!transactions || transactions.length === 0) {
     return <p className="py-5 text-center">Nenhuma transação encontrada!</p>;
   }
 
-  // Função para alternar o estado de "paid"
   const togglePaidStatus = async (
     transactionId: number,
     currentStatus: boolean
   ) => {
     try {
-      // Chamada API para atualizar o status no backend
       await axios.put(`baseURL/transaction/${transactionId}`, {
         paid: !currentStatus,
       });
 
-      // Atualize o estado no frontend (você pode optar por fazer um refetch das transações ou atualizar localmente)
-      // Para simplificação, assumiremos que o estado é atualizado localmente
       const updatedTransactions = transactions.map((transaction) =>
         transaction.id === transactionId
           ? { ...transaction, paid: !currentStatus }
           : transaction
       );
-      // Aqui, você deve atualizar o estado que mantém as transações (supondo que `transactions` seja um estado local ou vindo de props)
-      //updateTotals(updatedTransactions);
+      // Atualizar o estado local ou refazer a chamada API para atualizar transações
     } catch (error) {
       console.error("Erro ao atualizar o status da transação:", error);
     }
@@ -127,11 +114,8 @@ export default function TableTransactions({
 
     if (dateKey !== currentHeader) {
       transactionRows.push(
-        <tr key={`header-${transaction.id}`} className="border-2 ">
-          <td
-            colSpan={5} // Adicionar uma coluna extra para a mãozinha
-            className="text-red-600 text-center text-sm"
-          >
+        <tr key={`header-${transaction.id}`} className="border-2">
+          <td colSpan={5} className="text-red-600 text-center text-sm">
             📅 {dateKey}
           </td>
         </tr>
@@ -148,16 +132,22 @@ export default function TableTransactions({
         legacyBehavior
       >
         <tr className="group cursor-pointer hover:bg-blue-100">
-          <td className="p-2">{typeMapping[parseInt(transaction.type)]}</td>
           <td className="p-2">{transaction.category}</td>
-          <td className="p-2">{transaction.description}</td>
-          <td className="p-2">{formatCurrencyBRL(transaction.amount)}</td>
           <td className="p-2">
-            {transaction.paid ? (
+            {typeMapping[parseInt(transaction.description)]}
+          </td>
+          <td className="p-2">
+            {typeMapping[parseInt(transaction.recurrent)]}
+          </td>
+          <td className="p-2">{typeMapping[parseInt(transaction)]}</td>
+          <td className="p-2">{formatCurrencyBRL(transaction.amount)}</td>
+          <td className="p-2">{transaction.recurrent ? "Sim" : "Não"}</td>
+          <td className="p-2">
+            {transaction.isPaid ? (
               <FaThumbsUp
                 onClick={(e) => {
                   e.stopPropagation();
-                  togglePaidStatus(transaction.id, transaction.paid);
+                  togglePaidStatus(transaction.id, transaction.isPaid);
                 }}
                 className="text-green-500 cursor-pointer"
               />
@@ -165,7 +155,7 @@ export default function TableTransactions({
               <FaThumbsDown
                 onClick={(e) => {
                   e.stopPropagation();
-                  togglePaidStatus(transaction.id, transaction.paid);
+                  togglePaidStatus(transaction.id, transaction.isPaid);
                 }}
                 className="text-red-500 cursor-pointer"
               />
@@ -176,14 +166,12 @@ export default function TableTransactions({
     );
   });
 
-  // console.log("Transações recebidas:", transactions);
-  // console.log("Tipo de filtro:", filterType);
-  // console.log("Data atual:", currentMonth);
-  // console.log("Tipo de filtro:", filterType);
-
   return (
     <div className="flex justify-center overflow-x-auto">
       <div className="w-full max-w-4xl">
+        <p className="text-center border p-2 mb-2 font-thin border-amber-400">
+          Transações{" "}
+        </p>
         <table className="w-full divide-y divide-gray-200">
           <tbody>{transactionRows}</tbody>
         </table>

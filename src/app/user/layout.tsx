@@ -28,7 +28,7 @@ const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </main>
         </div>
         {/* Floating Button */}
-        <FloatingButton />
+        {/* <FloatingButton /> */}
 
         {/* Footer */}
         {/* <Footer /> */}

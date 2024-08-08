@@ -1,24 +1,22 @@
 'use client'
 
 export type Transactions = {
-    paid: any;
     id: number;
+    transactionType: number
     description: string;
     amount: number;
     date: string; // Mudei para string, já que está vindo como string
-    type: string;
+    isPaid: boolean;
     category: string;
     month: string;
-    payment: string;
     details: string;
+    recurrent: boolean
+    typeRecurrent: string
+
     
 
 };
 
-// export const getCurrentMonth = (): string => {
-//     let now = new Date();
-//     return `${now.getFullYear()}-${now.getMonth() + 1}`; // Mês começa em 0 no JS.
-// };
 
 export const getCurrentMonth = (): string => {
     let now = new Date();

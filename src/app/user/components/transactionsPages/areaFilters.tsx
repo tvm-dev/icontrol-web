@@ -1,4 +1,5 @@
 import React from "react";
+import NewTransactionButton from "../NewTransactionButton";
 
 type AreaFilterProps = {
   onFilterChange: (type: string | null) => void;
@@ -12,6 +13,7 @@ const AreaFilter: React.FC<AreaFilterProps> = ({ onFilterChange }) => {
 
   return (
     <div className="flex items-center justify-center space-x-4 my-5">
+      <NewTransactionButton />
       <div className="relative">
         <select
           id="filter"

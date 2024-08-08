@@ -11,6 +11,8 @@ import {
 } from "@/app/utils/boniak/dateFilter";
 import { api } from "../services/api";
 import { manualToken } from "../services/token";
+import NewTransactionModal from "../components/transactionsPages/NewTransactionModal";
+import NewTransactionButton from "../components/NewTransactionButton";
 
 export default function PageTransactions() {
   const [currentMonth, setCurrentMonth] = useState<string>(getCurrentMonth());
@@ -24,6 +26,7 @@ export default function PageTransactions() {
   const [fixedIncomes, setFixedIncomes] = useState<number>(0);
   const [investments, setInvestments] = useState<number>(0);
   const [filterType, setFilterType] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar a abertura do modal
 
   const calculateTotals = (filteredTransactions: Transactions[]) => {
     let ve = 0,
@@ -33,7 +36,7 @@ export default function PageTransactions() {
       inv = 0;
 
     filteredTransactions.forEach((transaction) => {
-      switch (parseInt(transaction.type)) {
+      switch (parseInt(transaction.transactionType)) {
         case 1:
           ve += transaction.amount;
           break;
@@ -68,7 +71,6 @@ export default function PageTransactions() {
           headers: { Authorization: `Bearer ${manualToken}` },
         });
         setTransactions(response.data);
-        //console.log(response.data);
       } catch (error) {
         console.error("Erro ao carregar transações:", error);
       }
@@ -90,25 +92,6 @@ export default function PageTransactions() {
     }
   }, [transactionFiltered]);
 
-  // const handleDelete = async (id: number) => {
-  //   const isConfirmed = window.confirm(
-  //     "Você realmente quer apagarXXX esta transação? Não será mais possível recuperá-la!"
-  //   );
-  //   if (!isConfirmed) return;
-
-  //   try {
-  //     await api.delete("/transaction", {
-  //       params: { id: id },
-  //       headers: { Authorization: `Bearer ${manualToken}` },
-  //     });
-  //     setTransactions(
-  //       transactions.filter((transaction) => transaction.id !== id)
-  //     );
-  //   } catch (error) {
-  //     console.error("Erro ao deletar transação:", error);
-  //   }
-  // };
-
   const handleMonthChange = (newMonth: string) => {
     setCurrentMonth(newMonth);
   };
@@ -119,7 +102,7 @@ export default function PageTransactions() {
 
   const filteredTransactions = filterType
     ? transactionFiltered.filter(
-        (transaction) => transaction.type.toString() === filterType
+        (transaction) => transaction.transactionType.toString() === filterType
       )
     : transactionFiltered;
 
@@ -135,6 +118,10 @@ export default function PageTransactions() {
     setFixedExpenses(fe);
     setFixedIncomes(fi);
     setInvestments(inv);
+  };
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
   };
 
   return (
