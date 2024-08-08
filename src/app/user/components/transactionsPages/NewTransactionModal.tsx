@@ -1,46 +1,44 @@
-"use client";
+import { useState, useEffect, useRef } from "react";
 import { api } from "../../services/api";
 import { manualToken, userID } from "../../services/token";
-import axios from "axios";
-import { FormEvent, useRef, useEffect, useState } from "react";
-import { FaThumbsUp, FaThumbsDown, FaWindowClose } from "react-icons/fa";
-import { getCurrentDate } from "@/app/utils/boniak/dateFilter";
+import { FaThumbsDown, FaThumbsUp, FaWindowClose } from "react-icons/fa";
 
-const typeMapping: { [key: string]: number } = {
-  Despesa: 1,
-  Receita: 2,
-  Investimento: 3,
+export type BankAccount = {
+  id: number;
+  name: string;
 };
 
-export default function NewTransactionModal({
-  onClose,
-}: {
-  onClose: () => void;
-}) {
-  const transactionTypeRef = useRef<HTMLSelectElement | null>(null);
+export type CreditCard = {
+  id: number;
+  name: string;
+};
+
+export type Category = {
+  id: number;
+  name: string;
+  typeCategory: string;
+  subCategories: any[]; // Ajuste conforme a estrutura real de subcategorias
+};
+
+const NewTransactionModal = ({ onClose }: { onClose: () => void }) => {
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
+  const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
+  const [selectedType, setSelectedType] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [isPaid, setIsPaid] = useState<boolean>(false);
+  const [isRecurrent, setIsRecurrent] = useState<boolean>(false);
+  const [recurrenceType, setRecurrenceType] = useState<string>("");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+
   const descriptionRef = useRef<HTMLInputElement | null>(null);
   const amountRef = useRef<HTMLInputElement | null>(null);
   const dateRef = useRef<HTMLInputElement | null>(null);
-  const isPaidRef = useRef<HTMLInputElement | null>(null);
   const bankCardRef = useRef<HTMLSelectElement | null>(null);
   const categoryRef = useRef<HTMLSelectElement | null>(null);
-  const recurrencyRef = useRef<HTMLSelectElement | null>(null);
+  const recurrencyRef = useRef<HTMLInputElement | null>(null);
   const typeRecurrencyRef = useRef<HTMLSelectElement | null>(null);
   const detailsRef = useRef<HTMLInputElement | null>(null);
-
-  const [selectedType, setSelectedType] = useState<number>(1);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
-    []
-  );
-  const [bankAccounts, setBankAccounts] = useState<
-    { id: number; name: string }[]
-  >([]);
-  const [amount, setAmount] = useState<string>("");
-  const [isPaid, setIsPaid] = useState<boolean>(true);
-  const [isRecurrent, setIsRecurrent] = useState<boolean>(false);
-  const [recurrenceType, setRecurrenceType] = useState<string>("");
-  //===============================================ok
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,108 +49,45 @@ export default function NewTransactionModal({
           headers: { Authorization: `Bearer ${manualToken}` },
         });
         setBankAccounts(bankAccountsResponse.data);
+
+        // Fetch Credit Cards from the API
+        const creditCardsResponse = await api.get("/creditcards", {
+          params: { userID: userID },
+          headers: { Authorization: `Bearer ${manualToken}` },
+        });
+        setCreditCards(creditCardsResponse.data);
+
+        // Fetch Categories from the API
+        const categoriesResponse = await api.get("/categories", {
+          params: { userID: userID },
+          headers: { Authorization: `Bearer ${manualToken}` },
+        });
+        console.log("Categorias recebidas:", categoriesResponse.data); // Adicione este log
+        setCategories(categoriesResponse.data);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
       }
-      // Fetch categories and accounts from the API
-      const categoriesResponse = await api.get("/categories", {
-        params: { userID: userID },
-        headers: { Authorization: `Bearer ${manualToken}` },
-      });
-      setCategories(categoriesResponse.data);
     };
 
     fetchData();
   }, []);
-  //===============================================ok
-  useEffect(() => {
-    if (dateRef.current) {
-      dateRef.current.value = getCurrentDate(); // Define a data atual
-    }
-  }, []);
-  //=================================================
-  const handleTypeChange = (typeNumber: number) => {
-    setSelectedType(typeNumber);
-    setSelectedCategory("");
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(e.target.value);
   };
 
-  const handleCategoryChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setSelectedCategory(event.target.value);
+  const handleTypeChange = (type: string) => {
+    setSelectedType(type);
   };
 
-  const formatToBRL = (value: string) => {
-    value = value.replace(/\D/g, "");
-    value = (parseInt(value) / 100).toFixed(2) + "";
-    value = value.replace(".", ",");
-    value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-    return value;
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
   };
 
-  const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value;
-    value = value.replace(/\./g, "").replace(",", ".");
-    setAmount(formatToBRL(value));
+  const handleRegisterTransaction = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Lógica para salvar a transação
   };
-
-  const handleRegisterTransaction = async (event: FormEvent) => {
-    event.preventDefault();
-
-    const numericAmount = parseFloat(
-      amount.replace(/\./g, "").replace(",", ".")
-    );
-
-    const transactionData = {
-      transactionType: selectedType,
-      description: descriptionRef.current?.value || "",
-      amount: numericAmount,
-      date: dateRef.current?.value || "",
-      isPaid: isPaid,
-      category: selectedCategory,
-      recurrent: isRecurrent,
-      typeRecurrent: isRecurrent ? recurrenceType : null,
-      details: detailsRef.current?.value || "",
-      userID: userID,
-    };
-
-    try {
-      const response = await api.post("/transaction", transactionData, {
-        params: { userID: userID },
-        headers: { Authorization: `Bearer ${manualToken}` },
-      });
-
-      if (response.status === 200) {
-        onClose(); // Fecha o modal após a transação ser salva
-        window.location.href = "/user/transactions";
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error(
-          "Erro ao carregar transações:",
-          error.response?.data || error.message
-        );
-      } else {
-        console.error("Erro desconhecido:", error);
-      }
-    }
-  };
-
-  useEffect(() => {
-    const elements = [
-      descriptionRef.current,
-      amountRef.current,
-      dateRef.current,
-      detailsRef.current,
-    ];
-
-    elements.forEach((el) => {
-      if (el) {
-        el.setAttribute("spellcheck", "false");
-        el.removeAttribute("data-ms-editor");
-      }
-    });
-  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 md:p-0">
@@ -170,14 +105,15 @@ export default function NewTransactionModal({
           className="flex flex-col w-full"
           onSubmit={handleRegisterTransaction}
         >
+          {/* Selecione o tipo de transação */}
           <div className="flex justify-center mb-4">
-            {Object.entries(typeMapping).map(([key, value]) => (
+            {["Receita", "Despesa"].map((key) => (
               <button
-                key={value}
+                key={key}
                 type="button"
-                onClick={() => handleTypeChange(value)}
+                onClick={() => handleTypeChange(key)}
                 className={`px-4 py-2 mx-1 ${
-                  selectedType === value
+                  selectedType === key
                     ? "bg-blue-500 text-white"
                     : "bg-gray-300"
                 } rounded`}
@@ -187,6 +123,7 @@ export default function NewTransactionModal({
             ))}
           </div>
 
+          {/* Descrição */}
           <label className="text-xs">Descrição:</label>
           <input
             ref={descriptionRef}
@@ -195,6 +132,7 @@ export default function NewTransactionModal({
             className="bg-blue-300 border border-1 w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
+          {/* Valor e Data */}
           <div className="flex flex-wrap justify-between space-y-2 md:space-y-0">
             <div className="flex flex-col w-full md:w-1/2">
               <label className="text-xs">Valor em R$:</label>
@@ -208,7 +146,6 @@ export default function NewTransactionModal({
                 className="bg-blue-300 border border-1 w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-
             <div className="flex flex-col w-full md:w-1/2">
               <label className="text-xs">Data:</label>
               <input
@@ -216,10 +153,12 @@ export default function NewTransactionModal({
                 required
                 type="date"
                 className="bg-blue-300 border border-1 w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                defaultValue={new Date().toISOString().split("T")[0]} // Define a data atual por padrão
               />
             </div>
           </div>
 
+          {/* Selecione se está pago */}
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
               {isPaid ? (
@@ -237,6 +176,7 @@ export default function NewTransactionModal({
             </div>
           </div>
 
+          {/* Contas Bancárias e Cartões de Crédito */}
           <div className="flex flex-wrap justify-between space-y-2 md:space-y-0">
             <div className="flex flex-col w-full md:w-1/2">
               <label className="text-xs">Conta/Cartão:</label>
@@ -244,34 +184,68 @@ export default function NewTransactionModal({
                 ref={bankCardRef}
                 className="bg-blue-400 border border-1 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Selecione uma conta ou cartão</option>
-                {bankAccounts.map((account) => (
-                  <option key={account.id} value={account.id}>
-                    {account.name}
+                {/* Mensagem padrão se não houver contas ou cartões */}
+                {bankAccounts.length === 0 && creditCards.length === 0 ? (
+                  <option disabled value="">
+                    Cadastre contas e cartões para que possam ser selecionados!
                   </option>
-                ))}
-              </select>
-            </div>
+                ) : (
+                  <>
+                    {/* Renderiza contas bancárias se houver */}
+                    {bankAccounts.length > 0 && (
+                      <optgroup label="Contas Bancárias">
+                        {bankAccounts.map((account) => (
+                          <option key={account.id} value={account.id}>
+                            {account.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
 
-            <div className="flex flex-col w-full md:w-1/2">
-              <label className="text-xs">Categoria:</label>
-              <select
-                ref={categoryRef}
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-                disabled={!selectedType}
-                className="bg-blue-400 border border-1 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Selecione uma categoria</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
+                    {/* Renderiza cartões de crédito se houver */}
+                    {creditCards.length > 0 && (
+                      <optgroup label="Cartões de Crédito">
+                        {creditCards.map((card) => (
+                          <option key={card.id} value={card.id}>
+                            {card.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+
+                    {/* Mensagem padrão se houver contas ou cartões */}
+                    {(bankAccounts.length === 0 ||
+                      creditCards.length === 0) && (
+                      <option disabled value="">
+                        Selecione uma conta ou cartão
+                      </option>
+                    )}
+                  </>
+                )}
               </select>
             </div>
           </div>
 
+          {/* Categoria */}
+          <div className="flex flex-col w-full md:w-1/2">
+            <label className="text-xs">Categoria:</label>
+            <select
+              ref={categoryRef}
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+              disabled={!selectedType} // Desabilita o campo se nenhum tipo for selecionado
+              className="bg-blue-400 border border-1 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Selecione uma categoria</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Recorrência */}
           <label className="text-xs">Recorrente:</label>
           <input
             ref={recurrencyRef}
@@ -300,6 +274,7 @@ export default function NewTransactionModal({
             </>
           )}
 
+          {/* Detalhes */}
           <label className="text-xs">Detalhes:</label>
           <input
             ref={detailsRef}
@@ -317,4 +292,6 @@ export default function NewTransactionModal({
       </div>
     </div>
   );
-}
+};
+
+export default NewTransactionModal;
