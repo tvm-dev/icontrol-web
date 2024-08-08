@@ -231,29 +231,23 @@ const NewTransactionModal = ({ onClose }: { onClose: () => void }) => {
                 ref={categoryRef}
                 value={selectedCategory}
                 onChange={handleCategoryChange}
-                //disabled={!selectedType} // Dropdown desativado se selectedType for vazio
                 className="bg-blue-400 border border-1 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Selecione uma categoria</option>
+                {/* Renderiza categorias e subcategorias */}
                 {categories.map((category) => (
-                  <optgroup key={category.id} label={category.name}>
-                    {category.subCategories.length === 0 ? (
-                      <option value={category.id}>{category.name}</option>
-                    ) : (
-                      <>
-                        <option value={category.id}>{category.name}</option>
-                        {category.subCategories.map((subCategory) => (
-                          <option
-                            key={subCategory.id}
-                            value={subCategory.id}
-                            className="pl-4"
-                          >
-                            {subCategory.name}
-                          </option>
-                        ))}
-                      </>
-                    )}
-                  </optgroup>
+                  <>
+                    {/* Renderiza a categoria pai como uma opção */}
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                    {/* Renderiza subcategorias abaixo da categoria pai */}
+                    {category.subCategories.map((subCategory) => (
+                      <option key={subCategory.id} value={subCategory.id}>
+                        &nbsp;&nbsp;&nbsp;{subCategory.name}
+                      </option>
+                    ))}
+                  </>
                 ))}
               </select>
             </div>
