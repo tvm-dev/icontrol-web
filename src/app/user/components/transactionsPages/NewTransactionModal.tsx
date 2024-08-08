@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { api } from "../../services/api";
 import { manualToken, userID } from "../../services/token";
 import { FaThumbsDown, FaThumbsUp, FaWindowClose } from "react-icons/fa";
+import Select from "react-select";
 
 export type BankAccount = {
   id: number;
@@ -28,14 +29,13 @@ const NewTransactionModal = ({ onClose }: { onClose: () => void }) => {
   const [isPaid, setIsPaid] = useState<boolean>(false);
   const [isRecurrent, setIsRecurrent] = useState<boolean>(false);
   const [recurrenceType, setRecurrenceType] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedAccount, setSelectedAccount] = useState<any>(null);
 
   const descriptionRef = useRef<HTMLInputElement | null>(null);
   const amountRef = useRef<HTMLInputElement | null>(null);
   const dateRef = useRef<HTMLInputElement | null>(null);
-  const bankCardRef = useRef<HTMLSelectElement | null>(null);
-  const categoryRef = useRef<HTMLSelectElement | null>(null);
   const recurrencyRef = useRef<HTMLInputElement | null>(null);
   const typeRecurrencyRef = useRef<HTMLSelectElement | null>(null);
   const detailsRef = useRef<HTMLInputElement | null>(null);
@@ -79,8 +79,12 @@ const NewTransactionModal = ({ onClose }: { onClose: () => void }) => {
     setSelectedType(type);
   };
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(e.target.value);
+  const handleCategoryChange = (selectedOption: any) => {
+    setSelectedCategory(selectedOption);
+  };
+
+  const handleAccountChange = (selectedOption: any) => {
+    setSelectedAccount(selectedOption);
   };
 
   const handleRegisterTransaction = async (e: React.FormEvent) => {
@@ -106,7 +110,7 @@ const NewTransactionModal = ({ onClose }: { onClose: () => void }) => {
         >
           {/* Selecione o tipo de transação */}
           <div className="flex justify-center mb-4">
-            {["Receita", "Despesa"].map((key) => (
+            {["Receita", "Despesa", "Investimento"].map((key) => (
               <button
                 key={key}
                 type="button"
@@ -179,77 +183,47 @@ const NewTransactionModal = ({ onClose }: { onClose: () => void }) => {
           <div className="flex flex-wrap justify-between space-y-2 md:space-y-0">
             <div className="flex flex-col w-full md:w-1/2">
               <label className="text-xs">Conta/Cartão:</label>
-              <select
-                ref={bankCardRef}
-                className="bg-blue-400 border border-1 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {/* Mensagem padrão se não houver contas ou cartões */}
-                {bankAccounts.length === 0 && creditCards.length === 0 ? (
-                  <option disabled value="">
-                    Cadastre contas e cartões para que possam ser selecionados!
-                  </option>
-                ) : (
-                  <>
-                    {/* Renderiza contas bancárias se houver */}
-                    {bankAccounts.length > 0 && (
-                      <optgroup label="Contas Bancárias">
-                        {bankAccounts.map((account) => (
-                          <option key={account.id} value={account.id}>
-                            {account.name}
-                          </option>
-                        ))}
-                      </optgroup>
-                    )}
-
-                    {/* Renderiza cartões de crédito se houver */}
-                    {creditCards.length > 0 && (
-                      <optgroup label="Cartões de Crédito">
-                        {creditCards.map((card) => (
-                          <option key={card.id} value={card.id}>
-                            {card.name}
-                          </option>
-                        ))}
-                      </optgroup>
-                    )}
-
-                    {/* Mensagem padrão se houver contas ou cartões */}
-                    {(bankAccounts.length === 0 ||
-                      creditCards.length === 0) && (
-                      <option disabled value="">
-                        Selecione uma conta ou cartão
-                      </option>
-                    )}
-                  </>
-                )}
-              </select>
+              <Select
+                options={[
+                  ...bankAccounts.map((account) => ({
+                    value: account.id,
+                    label: account.name,
+                  })),
+                  ...creditCards.map((card) => ({
+                    value: card.id,
+                    label: card.name,
+                  })),
+                ]}
+                value={selectedAccount}
+                onChange={handleAccountChange}
+                className="react-select-container"
+                classNamePrefix="react-select"
+                placeholder="Selecione uma conta ou cartão"
+                isSearchable
+              />
             </div>
 
             {/* Categorias */}
             <div className="flex flex-col w-full md:w-1/2">
               <label className="text-xs">Categoria:</label>
-              <select
-                ref={categoryRef}
+              <Select
+                options={categories.map((category) => ({
+                  label: category.name,
+                  options: [
+                    { value: category.id, label: category.name },
+                    ...category.subCategories.map((subCategory) => ({
+                      value: subCategory.id,
+                      label: subCategory.name,
+                    })),
+                  ],
+                }))}
                 value={selectedCategory}
                 onChange={handleCategoryChange}
-                className="bg-blue-400 border border-1 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Selecione uma categoria</option>
-                {/* Renderiza categorias e subcategorias */}
-                {categories.map((category) => (
-                  <>
-                    {/* Renderiza a categoria pai como uma opção */}
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                    {/* Renderiza subcategorias abaixo da categoria pai */}
-                    {category.subCategories.map((subCategory) => (
-                      <option key={subCategory.id} value={subCategory.id}>
-                        &nbsp;&nbsp;&nbsp;{subCategory.name}
-                      </option>
-                    ))}
-                  </>
-                ))}
-              </select>
+                className="react-select-container"
+                classNamePrefix="react-select"
+                placeholder="Selecione uma categoria"
+                isSearchable
+              />
             </div>
           </div>
 
@@ -271,32 +245,32 @@ const NewTransactionModal = ({ onClose }: { onClose: () => void }) => {
                   ref={typeRecurrencyRef}
                   value={recurrenceType}
                   onChange={(e) => setRecurrenceType(e.target.value)}
-                  className="bg-blue-400 border border-1 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="bg-blue-400 border border-1 w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Selecione o tipo de repetição</option>
-                  <option value="weekly">Semanal</option>
-                  <option value="monthly">Mensal</option>
+                  <option value="">Selecione</option>
+                  <option value="diario">Diário</option>
+                  <option value="semanal">Semanal</option>
+                  <option value="mensal">Mensal</option>
+                  <option value="anual">Anual</option>
                 </select>
               </div>
             )}
           </div>
 
           {/* Detalhes */}
-          <div className="flex flex-col space-y-2 mt-4">
-            <label className="text-xs">Detalhes:</label>
-            <input
-              ref={detailsRef}
-              type="text"
-              className="bg-blue-300 border border-1 w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <label className="text-xs mt-2">Detalhes:</label>
+          <input
+            ref={detailsRef}
+            type="text"
+            className="bg-blue-400 border border-1 w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
 
-          {/* Botão de Salvar */}
+          {/* Botão de Enviar */}
           <button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded mt-4 w-full"
+            className="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
           >
-            Salvar
+            Registrar Transação
           </button>
         </form>
       </div>
