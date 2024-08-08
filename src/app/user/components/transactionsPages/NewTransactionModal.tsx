@@ -17,7 +17,7 @@ export type Category = {
   id: number;
   name: string;
   typeCategory: string;
-  subCategories: any[]; // Ajuste conforme a estrutura real de subcategorias
+  subCategories: { id: number; name: string }[];
 };
 
 const NewTransactionModal = ({ onClose }: { onClose: () => void }) => {
@@ -28,8 +28,8 @@ const NewTransactionModal = ({ onClose }: { onClose: () => void }) => {
   const [isPaid, setIsPaid] = useState<boolean>(false);
   const [isRecurrent, setIsRecurrent] = useState<boolean>(false);
   const [recurrenceType, setRecurrenceType] = useState<string>("");
-  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const descriptionRef = useRef<HTMLInputElement | null>(null);
   const amountRef = useRef<HTMLInputElement | null>(null);
@@ -62,7 +62,6 @@ const NewTransactionModal = ({ onClose }: { onClose: () => void }) => {
           params: { userID: userID },
           headers: { Authorization: `Bearer ${manualToken}` },
         });
-        console.log("Categorias recebidas:", categoriesResponse.data); // Adicione este log
         setCategories(categoriesResponse.data);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
@@ -224,67 +223,84 @@ const NewTransactionModal = ({ onClose }: { onClose: () => void }) => {
                 )}
               </select>
             </div>
-          </div>
 
-          {/* Categoria */}
-          <div className="flex flex-col w-full md:w-1/2">
-            <label className="text-xs">Categoria:</label>
-            <select
-              ref={categoryRef}
-              value={selectedCategory}
-              onChange={handleCategoryChange}
-              disabled={!selectedType} // Desabilita o campo se nenhum tipo for selecionado
-              className="bg-blue-400 border border-1 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Selecione uma categoria</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Recorrência */}
-          <label className="text-xs">Recorrente:</label>
-          <input
-            ref={recurrencyRef}
-            type="checkbox"
-            checked={isRecurrent}
-            onChange={() => setIsRecurrent(!isRecurrent)}
-            className="mr-2"
-          />
-          <label htmlFor="recurrence">Sim</label>
-
-          {isRecurrent && (
-            <>
-              <label className="text-xs">Tipo de Recorrência:</label>
+            {/* Categorias */}
+            <div className="flex flex-col w-full md:w-1/2">
+              <label className="text-xs">Categoria:</label>
               <select
-                ref={typeRecurrencyRef}
-                value={recurrenceType}
-                onChange={(e) => setRecurrenceType(e.target.value)}
+                ref={categoryRef}
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                //disabled={!selectedType} // Dropdown desativado se selectedType for vazio
                 className="bg-blue-400 border border-1 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Selecione o tipo de recorrência</option>
-                <option value="Diária">Diária</option>
-                <option value="Semanal">Semanal</option>
-                <option value="Mensal">Mensal</option>
-                <option value="Anual">Anual</option>
+                <option value="">Selecione uma categoria</option>
+                {categories.map((category) => (
+                  <optgroup key={category.id} label={category.name}>
+                    {category.subCategories.length === 0 ? (
+                      <option value={category.id}>{category.name}</option>
+                    ) : (
+                      <>
+                        <option value={category.id}>{category.name}</option>
+                        {category.subCategories.map((subCategory) => (
+                          <option
+                            key={subCategory.id}
+                            value={subCategory.id}
+                            className="pl-4"
+                          >
+                            {subCategory.name}
+                          </option>
+                        ))}
+                      </>
+                    )}
+                  </optgroup>
+                ))}
               </select>
-            </>
-          )}
+            </div>
+          </div>
+
+          {/* Repetição e Tipo de Repetição */}
+          <div className="flex flex-col space-y-2 mt-2">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                ref={recurrencyRef}
+                checked={isRecurrent}
+                onChange={() => setIsRecurrent(!isRecurrent)}
+              />
+              <span className="text-xs">Repetir</span>
+            </div>
+            {isRecurrent && (
+              <div className="flex flex-col space-y-2">
+                <label className="text-xs">Tipo de Repetição:</label>
+                <select
+                  ref={typeRecurrencyRef}
+                  value={recurrenceType}
+                  onChange={(e) => setRecurrenceType(e.target.value)}
+                  className="bg-blue-400 border border-1 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Selecione o tipo de repetição</option>
+                  <option value="weekly">Semanal</option>
+                  <option value="monthly">Mensal</option>
+                </select>
+              </div>
+            )}
+          </div>
 
           {/* Detalhes */}
-          <label className="text-xs">Detalhes:</label>
-          <input
-            ref={detailsRef}
-            type="text"
-            className="bg-blue-300 border border-1 w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <div className="flex flex-col space-y-2 mt-4">
+            <label className="text-xs">Detalhes:</label>
+            <input
+              ref={detailsRef}
+              type="text"
+              className="bg-blue-300 border border-1 w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
+          {/* Botão de Salvar */}
           <button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+            className="bg-blue-500 text-white px-4 py-2 rounded mt-4 w-full"
           >
             Salvar
           </button>
