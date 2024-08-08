@@ -95,6 +95,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <span>Transações</span>
                 </a>
               </li>
+
               <li className="">
                 <a
                   href="/user/investments"
@@ -135,9 +136,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </li>
             </ul>
 
-            <div className="ml-10">
+            {/* <div className="ml-10">
               <NewTransactionButton />
-            </div>
+            </div> */}
           </nav>
         </div>
         <div className="flex flex-col justify-between p-4">

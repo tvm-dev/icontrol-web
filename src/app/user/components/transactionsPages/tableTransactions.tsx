@@ -169,8 +169,8 @@ export default function TableTransactions({
   return (
     <div className="flex justify-center overflow-x-auto">
       <div className="w-full max-w-4xl">
-        <p className="text-center border p-2 mb-2 font-thin border-amber-400">
-          Transações{" "}
+        <p className="text-center p-2 mb-2 font-bold border-amber-100">
+          Transações
         </p>
         <table className="w-full divide-y divide-gray-200">
           <tbody>{transactionRows}</tbody>

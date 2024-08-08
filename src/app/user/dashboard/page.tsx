@@ -8,6 +8,7 @@ import Link from "next/link";
 import { formatCurrencyBRL } from "../../utils/formatCurrencies";
 import Greeting from "../../utils/greetings";
 import BalancesCharts from "../components/charts/balances";
+import NewTransactionButton from "../components/NewTransactionButton";
 
 export default function Dashboard() {
   const [fiSum, setFiSum] = useState<number | null>(null);
@@ -92,9 +93,10 @@ export default function Dashboard() {
         <meta name="description" content="Descrição da Página no Cliente" />
       </Head>
 
-      <div className="md:ml-5 p-4 pt-5 ">
+      <div className="md:ml-5 p-4 pt-7 ">
         <div className="flex flex-row justify-between">
-          <h2 className="font-bold mt-5">Início</h2>
+          <h2 className="font-bold mt-2">Início</h2>
+          <NewTransactionButton />
         </div>
 
         <div className="text-center">

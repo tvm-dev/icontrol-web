@@ -17,9 +17,9 @@ const NewTransactionButton = () => {
       <div className="flex justify-start">
         <button
           onClick={toggleModal}
-          className="border-2 border-blue-500 p-2 text-red font-semibold rounded hover:bg-gradient-to-r hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 transition duration-1000"
+          className="border-2 border-blue-500 p-2 mt-2 text-red text-sm rounded hover:bg-gradient-to-r hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 transition duration-1000"
         >
-          +Transação
+          + Nova Transação
         </button>
       </div>
       {isModalOpen && <NewTransactionModal onClose={toggleModal} />}
